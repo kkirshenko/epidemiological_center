@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр проверки</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableArea, #printableArea * {
+                visibility: visible;
+            }
+            #printableArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        .detail-row {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #333;
+            min-width: 220px;
+            display: inline-block;
+        }
+        .action-buttons {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .action-buttons .btn {
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<main class="container">
+    <div class="no-print" style="margin-bottom: 1rem;">
+        <a th:href="@{/inspections}" class="btn">Назад</a>
+    </div>
+
+    <div id="printableArea">
+        <h2>Проверка</h2>
+
+        <div class="detail-row">
+            <span class="detail-label">Организация:</span>
+            <span th:text="${inspection.organization != null ? inspection.organization.name : '-'}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Тип проверки:</span>
+            <span th:text="${inspection.type != null ? inspection.type.name : '-'}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Проверяющий:</span>
+            <span th:text="${inspection.inspector != null ? inspection.inspector.fullName : '-'}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Плановая дата:</span>
+            <span th:text="${inspection.scheduledDate != null ? inspection.scheduledDate : '-'}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Дата начала:</span>
+            <span th:text="${inspection.startDate != null ? inspection.startDate : '-'}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Дата окончания:</span>
+            <span th:text="${inspection.endDate != null ? inspection.endDate : '-'}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Статус:</span>
+            <span th:text="${inspection.status == 'planned' ? 'Запланирована' : (inspection.status == 'in_progress' ? 'В процессе' : (inspection.status == 'completed' ? 'Завершена' : (inspection.status == 'cancelled' ? 'Отменена' : inspection.status)))}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Результат:</span>
+            <span th:text="${inspection.result == 'pending' ? 'Ожидается' : (inspection.result == 'satisfactory' ? 'Удовлетворительно' : (inspection.result == 'unsatisfactory' ? 'Неудовлетворительно' : (inspection.result == 'critical' ? 'Критическое' : inspection.result)))}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Номер акта:</span>
+            <span th:text="${inspection.actNumber != null ? inspection.actNumber : '-'}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Краткое заключение:</span>
+            <span th:text="${inspection.findingsSummary != null && !inspection.findingsSummary.isEmpty() ? inspection.findingsSummary : '-'}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Рекомендации:</span>
+            <span th:text="${inspection.recommendations != null && !inspection.recommendations.isEmpty() ? inspection.recommendations : '-'}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Дата создания:</span>
+            <span th:text="${inspection.createdAt != null ? #temporals.format(inspection.createdAt, 'dd.MM.yyyy') : '-'}"></span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Дата обновления:</span>
+            <span th:text="${inspection.updatedAt != null ? #temporals.format(inspection.updatedAt, 'dd.MM.yyyy') : '-'}"></span>
+        </div>
+    </div>
+
+    <div class="action-buttons no-print">
+        <button onclick="window.print()" class="btn">🖨️ Печать</button>
+        <a th:if="${inspection.id != null}" th:href="@{/inspections/{id}/edit(id=${inspection.id})}" class="btn manage-inspections">Редактировать</a>
+        <form th:if="${inspection.id != null}" th:action="@{/inspections/{id}/delete(id=${inspection.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger manage-inspections" onclick="return confirm('Вы уверены?');">Удалить</button>
+        </form>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 СанЭпидЦентр. Все права защищены.</p>
+        <p>Связаться с нами:
+            <a href="https://github.com/kkirshenko" target="_blank" rel="noopener" class="social-icon" title="GitHub"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+            <a href="https://vk.com/k.kirshenko" target="_blank" rel="noopener" class="social-icon" title="ВКонтакте"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15.073 2H8.937C5.009 2 2 5.009 2 8.937v6.126C2 18.991 5.009 22 8.937 22h6.136C18.991 22 22 18.991 22 15.063V8.937C22 5.009 18.991 2 15.073 2zM17.89 14.95c.465.465.93.93 1.455.93h.525v1.575h-1.05c-.525 0-1.05-.262-1.575-.787l-.525-.525c-.465-.465-.93-.93-1.455-.93h-.525v.525c0 .525-.262 1.05-.787 1.575l-.525.525c-.465.465-.93.93-1.455.93h-.525v-1.05c0-.525.262-1.05.787-1.575l.525-.525c.465-.465.93-.93.93-1.455v-.525h-.525c-.525 0-1.05-.262-1.575-.787l-.525-.525c-.465-.465-.93-.93-.93-1.455v-.525h1.05c.525 0 1.05.262 1.575.787l.525.525c.465.465.93.93 1.455.93h.525v-.525c0-.525.262-1.05.787-1.575l.525-.525c.465-.465.93-.93 1.455-.93h.525v1.05c0 .525-.262 1.05-.787 1.575l-.525.525c-.465.465.93.93-.93 1.455v.525h.525c.525 0 1.05.262 1.575.787l.525.525z"/></svg></a>
+        </p>
+    </div>
+</footer>
+
+<script th:src="@{/js/auth.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        requireAuth();
+    });
+</script>
+</body>
+</html>
