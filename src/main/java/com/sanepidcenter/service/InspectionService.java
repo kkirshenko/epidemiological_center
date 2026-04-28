@@ -28,7 +28,7 @@ public class InspectionService {
     private final ProfileRepository profileRepository;
 
     public List<Inspection> getAllInspections() {
-        return inspectionRepository.findAll();
+        return inspectionRepository.findAllWithDetails();
     }
 
     public List<Inspection> getInspectionsByOrganization(UUID organizationId) {
@@ -99,6 +99,10 @@ public class InspectionService {
 
     @Transactional
     public Inspection createInspection(Inspection inspection) {
+        applyDefaults(inspection);
+        if (inspection.getScheduledDate() == null) {
+            throw new IllegalArgumentException("Scheduled date is required");
+        }
         if (inspection.getId() == null) {
             inspection.setId(UUID.randomUUID());
         }
@@ -110,11 +114,20 @@ public class InspectionService {
 
     @Transactional
     public Inspection updateInspection(UUID id, Inspection updatedInspection) {
+        applyDefaults(updatedInspection);
         return inspectionRepository.findById(id)
                 .map(existing -> {
                     normalizeResultAndStatus(updatedInspection);
-                    
-                    existing.setScheduledDate(updatedInspection.getScheduledDate());
+
+                    LocalDate effectiveScheduledDate = updatedInspection.getScheduledDate() != null
+                            ? updatedInspection.getScheduledDate()
+                            : existing.getScheduledDate();
+                    if (effectiveScheduledDate == null) {
+                        effectiveScheduledDate = existing.getStartDate();
+                    }
+                    if (effectiveScheduledDate != null) {
+                        existing.setScheduledDate(effectiveScheduledDate);
+                    }
                     existing.setStatus(updatedInspection.getStatus());
                     existing.setResult(updatedInspection.getResult());
                     existing.setFindingsSummary(updatedInspection.getFindingsSummary());
@@ -123,7 +136,7 @@ public class InspectionService {
 
                     // Сохраняем существующие startDate и endDate, если они уже установлены
                     if (existing.getStartDate() == null) {
-                        existing.setStartDate(updatedInspection.getScheduledDate());
+                        existing.setStartDate(effectiveScheduledDate);
                     }
                     if ("completed".equalsIgnoreCase(updatedInspection.getStatus())) {
                         if (existing.getEndDate() == null) {
@@ -193,6 +206,24 @@ public class InspectionService {
 
         if (result != null && !result.isBlank()) {
             inspection.setStatus("completed");
+        }
+    }
+
+    private void applyDefaults(Inspection inspection) {
+        if (inspection.getStatus() == null || inspection.getStatus().isBlank()) {
+            inspection.setStatus("planned");
+        }
+        if (inspection.getResult() == null || inspection.getResult().isBlank()) {
+            inspection.setResult("pending");
+        }
+        if (inspection.getFindingsSummary() == null) {
+            inspection.setFindingsSummary("");
+        }
+        if (inspection.getRecommendations() == null) {
+            inspection.setRecommendations("");
+        }
+        if (inspection.getActNumber() != null && inspection.getActNumber().isBlank()) {
+            inspection.setActNumber(null);
         }
     }
 

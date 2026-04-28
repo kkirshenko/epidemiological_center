@@ -5,6 +5,7 @@ import com.sanepidcenter.dto.OrganizationTypeDto;
 import com.sanepidcenter.model.Organization;
 import com.sanepidcenter.model.OrganizationType;
 import com.sanepidcenter.service.OrganizationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class OrganizationApiController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createOrganization(@RequestBody OrganizationDto organizationDto) {
+    public ResponseEntity<?> createOrganization(@Valid @RequestBody OrganizationDto organizationDto) {
         try {
             Organization organization = convertToEntity(organizationDto);
             Organization created = organizationService.createOrganization(organization);
@@ -52,7 +53,7 @@ public class OrganizationApiController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateOrganization(
             @PathVariable UUID id,
-            @RequestBody OrganizationDto organizationDto) {
+            @Valid @RequestBody OrganizationDto organizationDto) {
         try {
             Organization organization = convertToEntity(organizationDto);
             Organization updated = organizationService.updateOrganization(id, organization);

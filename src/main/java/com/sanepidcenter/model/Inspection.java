@@ -1,10 +1,13 @@
 package com.sanepidcenter.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +32,7 @@ public class Inspection {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id", nullable = false)
+    @JsonIgnoreProperties({"inspections", "createdAt", "updatedAt"})
     private Organization organization;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,18 +41,16 @@ public class Inspection {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inspector_id", nullable = false)
+    @JsonIgnoreProperties({"password", "createdAt", "updatedAt"})
     private Profile inspector;
 
     @Column(name = "scheduled_date", nullable = false)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate scheduledDate;
 
     @Column(name = "start_date")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
 
     @Column(name = "end_date")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 
     @Column(name = "status", nullable = false, length = 20)
@@ -70,14 +72,19 @@ public class Inspection {
 
     @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore
     private List<Violation> violations = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime updatedAt;
 
     @PrePersist

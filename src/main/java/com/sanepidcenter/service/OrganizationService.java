@@ -85,6 +85,8 @@ public class OrganizationService {
 
     @Transactional
     public Organization createOrganization(Organization organization) {
+        applyDefaults(organization);
+
         if (organization.getId() == null) {
             organization.setId(UUID.randomUUID());
         }
@@ -103,6 +105,8 @@ public class OrganizationService {
 
     @Transactional
     public Organization updateOrganization(UUID id, Organization updatedOrganization) {
+        applyDefaults(updatedOrganization);
+
         return organizationRepository.findById(id)
                 .map(existing -> {
                     existing.setName(updatedOrganization.getName());
@@ -127,6 +131,27 @@ public class OrganizationService {
                     return organizationRepository.save(existing);
                 })
                 .orElseThrow(() -> new RuntimeException("Organization not found with id: " + id));
+    }
+
+    private void applyDefaults(Organization organization) {
+        if (organization.getShortName() == null || organization.getShortName().isBlank()) {
+            organization.setShortName(organization.getName());
+        }
+        if (organization.getNotes() == null) {
+            organization.setNotes("");
+        }
+        if (organization.getRegistrationNumber() != null && organization.getRegistrationNumber().isBlank()) {
+            organization.setRegistrationNumber(null);
+        }
+        if (organization.getEmployeeCount() == null) {
+            organization.setEmployeeCount(0);
+        }
+        if (organization.getRiskCategory() == null || organization.getRiskCategory().isBlank()) {
+            organization.setRiskCategory("medium");
+        }
+        if (organization.getIsActive() == null) {
+            organization.setIsActive(true);
+        }
     }
 
     @Transactional

@@ -62,8 +62,12 @@ public class OrganizationController {
 
     @PostMapping
     public String createOrganization(@ModelAttribute Organization organization) {
-        organizationService.createOrganization(organization);
-        return "redirect:/organizations";
+        try {
+            organizationService.createOrganization(organization);
+            return "redirect:/organizations";
+        } catch (RuntimeException e) {
+            return "redirect:/organizations/new?error=save_failed";
+        }
     }
 
     @GetMapping("/{id}/edit")
@@ -80,8 +84,12 @@ public class OrganizationController {
 
     @PostMapping("/{id}")
     public String updateOrganization(@PathVariable UUID id, @ModelAttribute Organization organization) {
-        organizationService.updateOrganization(id, organization);
-        return "redirect:/organizations";
+        try {
+            organizationService.updateOrganization(id, organization);
+            return "redirect:/organizations";
+        } catch (RuntimeException e) {
+            return "redirect:/organizations/" + id + "/edit?error=save_failed";
+        }
     }
 
     @PostMapping("/{id}/delete")

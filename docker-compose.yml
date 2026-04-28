@@ -1,4 +1,4 @@
-version: '3.8'
+name: sanepidcenter
 
 services:
   # PostgreSQL Database
@@ -24,6 +24,7 @@ services:
 
   # Spring Boot Application
   app:
+    image: sanepidcenter-app:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -36,12 +37,18 @@ services:
       DB_PASSWORD: postgres
       JWT_SECRET: SanEpidCenterSecretKeyForJWTTokenGenerationAndValidation2024VeryLongSecretKey
       JWT_EXPIRATION: 86400000
+      SPRING_PROFILES_ACTIVE: docker
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - sanepidcenter-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

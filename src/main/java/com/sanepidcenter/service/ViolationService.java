@@ -21,7 +21,7 @@ public class ViolationService {
     private final InspectionRepository inspectionRepository;
 
     public List<Violation> getAllViolations() {
-        return violationRepository.findAll();
+        return violationRepository.findAllWithDetails();
     }
 
     public List<Violation> searchAllFields(String query) {
@@ -120,6 +120,6 @@ public class ViolationService {
     }
 
     public java.util.Optional<Violation> getViolationById(UUID id) {
-        return violationRepository.findById(id);
+        return violationRepository.findByIdWithDetails(id);
     }
 }

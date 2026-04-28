@@ -67,14 +67,24 @@ public class InspectionController {
 
     @PostMapping
     public String createInspection(@ModelAttribute Inspection inspection) {
-        inspectionService.createInspection(inspection);
-        return "redirect:/inspections";
+        try {
+            inspectionService.createInspection(inspection);
+            return "redirect:/inspections";
+        } catch (RuntimeException e) {
+            return "redirect:/inspections/new?error=save_failed";
+        }
     }
 
     @GetMapping("/{id}/edit")
     public String editInspectionForm(@PathVariable UUID id, Model model) {
         return inspectionService.getInspectionById(id)
                 .map(inspection -> {
+                    if (inspection.getScheduledDate() == null && inspection.getStartDate() != null) {
+                        inspection.setScheduledDate(inspection.getStartDate());
+                    }
+                    if (inspection.getScheduledDate() == null) {
+                        inspection.setScheduledDate(java.time.LocalDate.now());
+                    }
                     model.addAttribute("inspection", inspection);
                     enrichFormModel(model);
                     filterInspectors(model);
@@ -85,8 +95,12 @@ public class InspectionController {
 
     @PostMapping("/{id}")
     public String updateInspection(@PathVariable UUID id, @ModelAttribute Inspection inspection) {
-        inspectionService.updateInspection(id, inspection);
-        return "redirect:/inspections";
+        try {
+            inspectionService.updateInspection(id, inspection);
+            return "redirect:/inspections";
+        } catch (RuntimeException e) {
+            return "redirect:/inspections/" + id + "/edit?error=save_failed";
+        }
     }
 
     @PostMapping("/{id}/delete")

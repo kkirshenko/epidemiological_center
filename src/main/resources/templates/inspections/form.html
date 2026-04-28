@@ -57,7 +57,7 @@
             <label for="scheduledDate">Плановая дата *</label>
             <input id="scheduledDate"
                    type="date"
-                   th:field="*{scheduledDate}"
+                   name="scheduledDate"
                    th:value="${inspection.scheduledDate != null ? #temporals.format(inspection.scheduledDate, 'yyyy-MM-dd') : ''}"
                    required>
         </div>

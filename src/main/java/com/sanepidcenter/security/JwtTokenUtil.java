@@ -9,8 +9,10 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import javax.crypto.SecretKey;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -59,7 +61,9 @@ public class JwtTokenUtil {
 
     public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
+        String normalizedRole = normalizeRole(role);
+        claims.put("role", normalizedRole);
+        claims.put("roles", Collections.singletonList(normalizedRole));
         return createToken(claims, username);
     }
 
@@ -106,5 +110,28 @@ public class JwtTokenUtil {
 
     public String extractRole(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class));
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> extractRoles(String token) {
+        return extractClaim(token, claims -> {
+            Object roles = claims.get("roles");
+            if (roles instanceof List<?> list) {
+                return list.stream().map(String::valueOf).toList();
+            }
+            String role = claims.get("role", String.class);
+            return role != null ? List.of(role) : List.of();
+        });
+    }
+
+    public String normalizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "ROLE_USER";
+        }
+        String normalized = role.trim().toUpperCase();
+        if (!normalized.startsWith("ROLE_")) {
+            normalized = "ROLE_" + normalized;
+        }
+        return normalized;
     }
 }

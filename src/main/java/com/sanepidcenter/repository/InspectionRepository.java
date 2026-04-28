@@ -16,6 +16,12 @@ import java.util.UUID;
  */
 @Repository
 public interface InspectionRepository extends JpaRepository<Inspection, UUID> {
+
+    @Query("SELECT DISTINCT i FROM Inspection i " +
+           "JOIN FETCH i.organization " +
+           "JOIN FETCH i.type " +
+           "JOIN FETCH i.inspector")
+    List<Inspection> findAllWithDetails();
     
     List<Inspection> findByOrganizationId(UUID organizationId);
     
@@ -46,7 +52,6 @@ public interface InspectionRepository extends JpaRepository<Inspection, UUID> {
            "JOIN FETCH i.organization " +
            "JOIN FETCH i.type " +
            "JOIN FETCH i.inspector " +
-           "LEFT JOIN FETCH i.violations " +
            "WHERE i.id = :id")
     Optional<Inspection> findByIdWithDetails(@Param("id") UUID id);
     

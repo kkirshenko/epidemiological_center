@@ -45,12 +45,13 @@ public class AuthController {
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
             Profile profile = profileRepository.findByUsername(request.getUsername()).orElseThrow();
             
-            String token = jwtTokenUtil.generateToken(request.getUsername(), profile.getRole());
+            String normalizedRole = jwtTokenUtil.normalizeRole(profile.getRole());
+            String token = jwtTokenUtil.generateToken(request.getUsername(), normalizedRole);
             
             AuthResponse response = AuthResponse.builder()
                 .token(token)
                 .username(profile.getUsername())
-                .role(profile.getRole())
+                .role(normalizedRole)
                 .fullName(profile.getFullName())
                 .build();
             
@@ -78,7 +79,7 @@ public class AuthController {
             .fullName(request.getFullName())
             .phone(request.getPhone())
             .position(request.getPosition())
-            .role(request.getRole() != null ? request.getRole() : "ROLE_INSPECTOR")
+            .role(jwtTokenUtil.normalizeRole(request.getRole() != null ? request.getRole() : "ROLE_INSPECTOR"))
             .isActive(true)
             .build();
 

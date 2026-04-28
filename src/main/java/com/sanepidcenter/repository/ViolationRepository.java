@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -14,6 +15,21 @@ import java.util.UUID;
  */
 @Repository
 public interface ViolationRepository extends JpaRepository<Violation, UUID> {
+
+    @Query("SELECT v FROM Violation v " +
+           "JOIN FETCH v.inspection i " +
+           "JOIN FETCH i.organization " +
+           "JOIN FETCH i.type " +
+           "JOIN FETCH i.inspector")
+    List<Violation> findAllWithDetails();
+
+    @Query("SELECT v FROM Violation v " +
+           "JOIN FETCH v.inspection i " +
+           "JOIN FETCH i.organization " +
+           "JOIN FETCH i.type " +
+           "JOIN FETCH i.inspector " +
+           "WHERE v.id = :id")
+    Optional<Violation> findByIdWithDetails(@Param("id") UUID id);
     
     List<Violation> findByInspectionId(UUID inspectionId);
     

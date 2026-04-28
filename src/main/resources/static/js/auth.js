@@ -132,7 +132,12 @@ function getToken() {
 
 function getCurrentUser() {
     const user = sessionStorage.getItem(USER_KEY);
-    return user ? JSON.parse(user) : null;
+    if (!user) return null;
+    const parsed = JSON.parse(user);
+    return {
+        ...parsed,
+        role: normalizeRole(parsed.role)
+    };
 }
 
 function isAuthenticated() {
@@ -154,12 +159,47 @@ function logout() {
 }
 
 function roleLabel(role) {
+    const normalized = normalizeRole(role);
     const labels = {
         ROLE_ADMIN: 'Администратор',
         ROLE_INSPECTOR: 'Проверяющий',
         ROLE_LABORANT: 'Лаборант'
     };
-    return labels[role] || role;
+    return labels[normalized] || normalized;
+}
+
+function normalizeRole(role) {
+    if (!role) return '';
+    const upper = String(role).toUpperCase().trim();
+    return upper.startsWith('ROLE_') ? upper : `ROLE_${upper}`;
+}
+
+function hasAnyRole(user, roles) {
+    if (!user) return false;
+    const normalizedUserRole = normalizeRole(user.role);
+    return roles.map(normalizeRole).includes(normalizedUserRole);
+}
+
+function enforcePageAccess() {
+    const path = window.location.pathname;
+    const user = getCurrentUser();
+
+    if (path === '/login') {
+        return true;
+    }
+
+    if (!user) {
+        window.location.href = '/login';
+        return false;
+    }
+
+    // Админские страницы
+    if ((path.startsWith('/users') || path === '/register') && !hasAnyRole(user, ['ROLE_ADMIN'])) {
+        window.location.href = '/';
+        return false;
+    }
+
+    return true;
 }
 
 function applyRoleVisibility(user) {
@@ -206,5 +246,8 @@ function updateAuthUI() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    if (!enforcePageAccess()) {
+        return;
+    }
     updateAuthUI();
 });

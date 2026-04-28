@@ -3,7 +3,6 @@ package com.sanepidcenter.config;
 import com.sanepidcenter.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -35,25 +34,28 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
+            .headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'"))
+                .frameOptions(frame -> frame.deny())
+            )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/auth/me").authenticated()
                 .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                 .requestMatchers("/", "/index.html").permitAll()
                 .requestMatchers("/ws/**").permitAll()
-                .requestMatchers("/login").permitAll()
-                .requestMatchers("/organizations/**", "/inspections/**", "/violations/**", "/register", "/users/**").permitAll()
+                .requestMatchers("/login", "/register").permitAll()
+                .requestMatchers("/", "/login", "/register").permitAll()
+                .requestMatchers("/organizations/**", "/inspections/**", "/violations/**", "/users/**").permitAll()
                 .requestMatchers("/*.html", "/pages/**").permitAll()
-                .requestMatchers("/api/organizations/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/inspections/**", "/api/violations/**").permitAll()
-                .requestMatchers("/api/inspections/**", "/api/violations/**").authenticated()
+                .requestMatchers("/api/organizations/**", "/api/inspections/**", "/api/violations/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/**").authenticated()
-                .anyRequest().authenticated()
+                .requestMatchers("/api/**").permitAll()
+                .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
