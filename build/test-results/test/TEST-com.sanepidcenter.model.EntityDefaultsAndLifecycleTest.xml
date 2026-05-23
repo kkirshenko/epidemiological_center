@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.model.EntityDefaultsAndLifecycleTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:23.740Z" hostname="VITALPC" time="0.009">
+  <properties/>
+  <testcase name="profile_DefaultsAndEnsureId_ShouldWork()" classname="com.sanepidcenter.model.EntityDefaultsAndLifecycleTest" time="0.002"/>
+  <testcase name="organizationInspectionViolation_DefaultsAndEnsureId_ShouldWork()" classname="com.sanepidcenter.model.EntityDefaultsAndLifecycleTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

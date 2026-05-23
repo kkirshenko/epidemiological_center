@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InspectionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.service</a> &gt; <span class="el_source">InspectionService.java</span></div><h1>InspectionService.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.service;
+
+import com.sanepidcenter.model.Inspection;
+import com.sanepidcenter.model.InspectionType;
+import com.sanepidcenter.model.Organization;
+import com.sanepidcenter.model.Profile;
+import com.sanepidcenter.repository.InspectionRepository;
+import com.sanepidcenter.repository.InspectionTypeRepository;
+import com.sanepidcenter.repository.OrganizationRepository;
+import com.sanepidcenter.repository.ProfileRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+<span class="fc" id="L21">@RequiredArgsConstructor</span>
+@Transactional(readOnly = true)
+public class InspectionService {
+
+    private final InspectionRepository inspectionRepository;
+    private final OrganizationRepository organizationRepository;
+    private final InspectionTypeRepository inspectionTypeRepository;
+    private final ProfileRepository profileRepository;
+
+    public List&lt;Inspection&gt; getAllInspections() {
+<span class="fc" id="L31">        return inspectionRepository.findAllWithDetails();</span>
+    }
+
+    public List&lt;Inspection&gt; getInspectionsByOrganization(UUID organizationId) {
+<span class="nc" id="L35">        return inspectionRepository.findByOrganizationId(organizationId);</span>
+    }
+
+    public List&lt;Inspection&gt; getInspectionsByInspector(UUID inspectorId) {
+<span class="nc" id="L39">        return inspectionRepository.findByInspectorId(inspectorId);</span>
+    }
+
+    public List&lt;Inspection&gt; getInspectionsByStatus(String status) {
+<span class="nc" id="L43">        return inspectionRepository.findByStatus(status);</span>
+    }
+
+    public List&lt;Inspection&gt; getPlannedInspections() {
+<span class="fc" id="L47">        return inspectionRepository.findByStatusOrderByScheduledDateDesc(&quot;planned&quot;);</span>
+    }
+
+    public Optional&lt;Inspection&gt; getInspectionById(UUID id) {
+<span class="fc" id="L51">        return inspectionRepository.findByIdWithDetails(id);</span>
+    }
+
+    public List&lt;Inspection&gt; getInspectionsByDateRange(LocalDate startDate, LocalDate endDate) {
+<span class="nc" id="L55">        return inspectionRepository.findByScheduledDateBetween(startDate, endDate);</span>
+    }
+
+    public List&lt;Inspection&gt; searchAllFields(String query) {
+<span class="nc" id="L59">        return inspectionRepository.findAllFieldsContainingIgnoreCase(query);</span>
+    }
+
+    public List&lt;Inspection&gt; sortInspections(List&lt;Inspection&gt; inspections, String sortBy, String sortDir) {
+<span class="pc bpc" id="L63" title="2 of 4 branches missed.">        if (sortBy == null || sortBy.isEmpty()) {</span>
+<span class="nc" id="L64">            return inspections;</span>
+        }
+        
+<span class="pc bpc" id="L67" title="2 of 4 branches missed.">        boolean ascending = sortDir == null || &quot;asc&quot;.equalsIgnoreCase(sortDir);</span>
+        
+<span class="fc" id="L69">        return inspections.stream()</span>
+<span class="fc" id="L70">            .sorted((i1, i2) -&gt; {</span>
+<span class="fc" id="L71">                int cmp = 0;</span>
+<span class="pc bpc" id="L72" title="5 of 6 branches missed.">                switch (sortBy.toLowerCase()) {</span>
+                    case &quot;organization&quot;:
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">                        String org1 = i1.getOrganization() != null ? i1.getOrganization().getName() : &quot;&quot;;</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">                        String org2 = i2.getOrganization() != null ? i2.getOrganization().getName() : &quot;&quot;;</span>
+<span class="fc" id="L76">                        cmp = org1.compareToIgnoreCase(org2);</span>
+<span class="fc" id="L77">                        break;</span>
+                    case &quot;type&quot;:
+<span class="nc bnc" id="L79" title="All 2 branches missed.">                        String type1 = i1.getType() != null ? i1.getType().getName() : &quot;&quot;;</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">                        String type2 = i2.getType() != null ? i2.getType().getName() : &quot;&quot;;</span>
+<span class="nc" id="L81">                        cmp = type1.compareToIgnoreCase(type2);</span>
+<span class="nc" id="L82">                        break;</span>
+                    case &quot;scheduleddate&quot;:
+<span class="nc" id="L84">                        cmp = i1.getScheduledDate().compareTo(i2.getScheduledDate());</span>
+<span class="nc" id="L85">                        break;</span>
+                    case &quot;status&quot;:
+<span class="nc" id="L87">                        cmp = i1.getStatus().compareToIgnoreCase(i2.getStatus());</span>
+<span class="nc" id="L88">                        break;</span>
+                    case &quot;result&quot;:
+<span class="nc" id="L90">                        cmp = i1.getResult().compareToIgnoreCase(i2.getResult());</span>
+<span class="nc" id="L91">                        break;</span>
+                    default:
+<span class="nc" id="L93">                        cmp = 0;</span>
+                }
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">                return ascending ? cmp : -cmp;</span>
+            })
+<span class="fc" id="L97">            .toList();</span>
+    }
+
+    @Transactional
+    public Inspection createInspection(Inspection inspection) {
+<span class="fc" id="L102">        applyDefaults(inspection);</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        if (inspection.getScheduledDate() == null) {</span>
+<span class="fc" id="L104">            throw new IllegalArgumentException(&quot;Scheduled date is required&quot;);</span>
+        }
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if (inspection.getId() == null) {</span>
+<span class="nc" id="L107">            inspection.setId(UUID.randomUUID());</span>
+        }
+<span class="fc" id="L109">        normalizeResultAndStatus(inspection);</span>
+<span class="fc" id="L110">        applyInspectionDates(inspection);</span>
+<span class="fc" id="L111">        attachManagedReferences(inspection);</span>
+<span class="fc" id="L112">        return inspectionRepository.save(inspection);</span>
+    }
+
+    @Transactional
+    public Inspection updateInspection(UUID id, Inspection updatedInspection) {
+<span class="fc" id="L117">        applyDefaults(updatedInspection);</span>
+<span class="pc" id="L118">        return inspectionRepository.findById(id)</span>
+<span class="fc" id="L119">                .map(existing -&gt; {</span>
+<span class="nc" id="L120">                    normalizeResultAndStatus(updatedInspection);</span>
+
+<span class="nc bnc" id="L122" title="All 2 branches missed.">                    LocalDate effectiveScheduledDate = updatedInspection.getScheduledDate() != null</span>
+<span class="nc" id="L123">                            ? updatedInspection.getScheduledDate()</span>
+<span class="nc" id="L124">                            : existing.getScheduledDate();</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">                    if (effectiveScheduledDate == null) {</span>
+<span class="nc" id="L126">                        effectiveScheduledDate = existing.getStartDate();</span>
+                    }
+<span class="nc bnc" id="L128" title="All 2 branches missed.">                    if (effectiveScheduledDate != null) {</span>
+<span class="nc" id="L129">                        existing.setScheduledDate(effectiveScheduledDate);</span>
+                    }
+<span class="nc" id="L131">                    existing.setStatus(updatedInspection.getStatus());</span>
+<span class="nc" id="L132">                    existing.setResult(updatedInspection.getResult());</span>
+<span class="nc" id="L133">                    existing.setFindingsSummary(updatedInspection.getFindingsSummary());</span>
+<span class="nc" id="L134">                    existing.setRecommendations(updatedInspection.getRecommendations());</span>
+<span class="nc" id="L135">                    existing.setActNumber(updatedInspection.getActNumber());</span>
+
+                    // Сохраняем существующие startDate и endDate, если они уже установлены
+<span class="nc bnc" id="L138" title="All 2 branches missed.">                    if (existing.getStartDate() == null) {</span>
+<span class="nc" id="L139">                        existing.setStartDate(effectiveScheduledDate);</span>
+                    }
+<span class="nc bnc" id="L141" title="All 2 branches missed.">                    if (&quot;completed&quot;.equalsIgnoreCase(updatedInspection.getStatus())) {</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">                        if (existing.getEndDate() == null) {</span>
+<span class="nc" id="L143">                            existing.setEndDate(LocalDate.now());</span>
+                        }
+                    } else {
+<span class="nc" id="L146">                        existing.setEndDate(null);</span>
+                    }
+
+<span class="nc bnc" id="L149" title="All 4 branches missed.">                    if (updatedInspection.getOrganization() != null &amp;&amp; updatedInspection.getOrganization().getId() != null) {</span>
+<span class="nc" id="L150">                        Organization organization = organizationRepository.findById(updatedInspection.getOrganization().getId())</span>
+<span class="nc" id="L151">                                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Organization not found: &quot; + updatedInspection.getOrganization().getId()));</span>
+<span class="nc" id="L152">                        existing.setOrganization(organization);</span>
+                    }
+<span class="nc bnc" id="L154" title="All 4 branches missed.">                    if (updatedInspection.getType() != null &amp;&amp; updatedInspection.getType().getId() != null) {</span>
+<span class="nc" id="L155">                        InspectionType inspectionType = inspectionTypeRepository.findById(updatedInspection.getType().getId())</span>
+<span class="nc" id="L156">                                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Inspection type not found: &quot; + updatedInspection.getType().getId()));</span>
+<span class="nc" id="L157">                        existing.setType(inspectionType);</span>
+                    }
+<span class="nc bnc" id="L159" title="All 4 branches missed.">                    if (updatedInspection.getInspector() != null &amp;&amp; updatedInspection.getInspector().getId() != null) {</span>
+<span class="nc" id="L160">                        Profile inspector = profileRepository.findById(updatedInspection.getInspector().getId())</span>
+<span class="nc" id="L161">                                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Inspector not found: &quot; + updatedInspection.getInspector().getId()));</span>
+<span class="nc" id="L162">                        existing.setInspector(inspector);</span>
+                    }
+
+<span class="nc" id="L165">                    return inspectionRepository.save(existing);</span>
+                })
+<span class="pc" id="L167">                .orElseThrow(() -&gt; new RuntimeException(&quot;Inspection not found with id: &quot; + id));</span>
+    }
+
+    @Transactional
+    public void deleteInspection(UUID id) {
+<span class="nc" id="L172">        inspectionRepository.deleteById(id);</span>
+<span class="nc" id="L173">    }</span>
+
+    private void attachManagedReferences(Inspection inspection) {
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">        UUID organizationId = inspection.getOrganization() != null ? inspection.getOrganization().getId() : null;</span>
+<span class="pc bpc" id="L177" title="1 of 2 branches missed.">        Integer typeId = inspection.getType() != null ? inspection.getType().getId() : null;</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">        UUID inspectorId = inspection.getInspector() != null ? inspection.getInspector().getId() : null;</span>
+
+<span class="pc bpc" id="L180" title="3 of 6 branches missed.">        if (organizationId == null || typeId == null || inspectorId == null) {</span>
+<span class="nc" id="L181">            throw new IllegalArgumentException(&quot;Organization, inspection type and inspector are required&quot;);</span>
+        }
+
+<span class="fc" id="L184">        Organization organization = organizationRepository.findById(organizationId)</span>
+<span class="pc" id="L185">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Organization not found: &quot; + organizationId));</span>
+<span class="fc" id="L186">        InspectionType inspectionType = inspectionTypeRepository.findById(typeId)</span>
+<span class="pc" id="L187">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Inspection type not found: &quot; + typeId));</span>
+<span class="fc" id="L188">        Profile inspector = profileRepository.findById(inspectorId)</span>
+<span class="pc" id="L189">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Inspector not found: &quot; + inspectorId));</span>
+
+<span class="fc" id="L191">        inspection.setOrganization(organization);</span>
+<span class="fc" id="L192">        inspection.setType(inspectionType);</span>
+<span class="fc" id="L193">        inspection.setInspector(inspector);</span>
+<span class="fc" id="L194">    }</span>
+
+    private void normalizeResultAndStatus(Inspection inspection) {
+<span class="fc" id="L197">        String result = inspection.getResult();</span>
+<span class="fc" id="L198">        String status = inspection.getStatus();</span>
+
+<span class="fc bfc" id="L200" title="All 2 branches covered.">        if (&quot;pending&quot;.equalsIgnoreCase(result)) {</span>
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">            if (&quot;completed&quot;.equalsIgnoreCase(status)) {</span>
+<span class="nc" id="L202">                inspection.setStatus(&quot;planned&quot;);</span>
+            }
+<span class="fc" id="L204">            return;</span>
+        }
+
+<span class="pc bpc" id="L207" title="2 of 4 branches missed.">        if (result != null &amp;&amp; !result.isBlank()) {</span>
+<span class="fc" id="L208">            inspection.setStatus(&quot;completed&quot;);</span>
+        }
+<span class="fc" id="L210">    }</span>
+
+    private void applyDefaults(Inspection inspection) {
+<span class="pc bpc" id="L213" title="2 of 4 branches missed.">        if (inspection.getStatus() == null || inspection.getStatus().isBlank()) {</span>
+<span class="nc" id="L214">            inspection.setStatus(&quot;planned&quot;);</span>
+        }
+<span class="pc bpc" id="L216" title="2 of 4 branches missed.">        if (inspection.getResult() == null || inspection.getResult().isBlank()) {</span>
+<span class="nc" id="L217">            inspection.setResult(&quot;pending&quot;);</span>
+        }
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">        if (inspection.getFindingsSummary() == null) {</span>
+<span class="nc" id="L220">            inspection.setFindingsSummary(&quot;&quot;);</span>
+        }
+<span class="pc bpc" id="L222" title="1 of 2 branches missed.">        if (inspection.getRecommendations() == null) {</span>
+<span class="nc" id="L223">            inspection.setRecommendations(&quot;&quot;);</span>
+        }
+<span class="pc bpc" id="L225" title="3 of 4 branches missed.">        if (inspection.getActNumber() != null &amp;&amp; inspection.getActNumber().isBlank()) {</span>
+<span class="nc" id="L226">            inspection.setActNumber(null);</span>
+        }
+<span class="fc" id="L228">    }</span>
+
+    private void applyInspectionDates(Inspection inspection) {
+<span class="pc bpc" id="L231" title="2 of 4 branches missed.">        if (inspection.getScheduledDate() != null &amp;&amp; inspection.getStartDate() == null) {</span>
+<span class="fc" id="L232">            inspection.setStartDate(inspection.getScheduledDate());</span>
+        }
+
+<span class="fc bfc" id="L235" title="All 2 branches covered.">        if (&quot;completed&quot;.equalsIgnoreCase(inspection.getStatus())) {</span>
+<span class="pc bpc" id="L236" title="1 of 2 branches missed.">            if (inspection.getEndDate() == null) {</span>
+<span class="fc" id="L237">                inspection.setEndDate(LocalDate.now());</span>
+            }
+<span class="fc" id="L239">            return;</span>
+        }
+<span class="fc" id="L241">        inspection.setEndDate(null);</span>
+<span class="fc" id="L242">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.security.CustomUserDetailsServiceTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:23.793Z" hostname="VITALPC" time="0.013">
+  <properties/>
+  <testcase name="loadUserByUsername_WhenMissingOrInactive_ShouldThrow()" classname="com.sanepidcenter.security.CustomUserDetailsServiceTest" time="0.006"/>
+  <testcase name="loadUserByUsername_WhenActiveAndRoleWithoutPrefix_ShouldAddPrefix()" classname="com.sanepidcenter.security.CustomUserDetailsServiceTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

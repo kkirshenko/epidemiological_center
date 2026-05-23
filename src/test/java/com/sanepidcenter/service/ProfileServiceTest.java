@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -77,5 +78,30 @@ class ProfileServiceTest {
         assertEquals("Updated Name", updated.getFullName());
         assertEquals("ROLE_ADMIN", updated.getRole());
         assertFalse(updated.getIsActive());
+    }
+
+    @Test
+    void getProfileById_WhenMissing_ShouldReturnNull() {
+        UUID id = UUID.randomUUID();
+        when(profileRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertNull(profileService.getProfileById(id));
+    }
+
+    @Test
+    void getAllProfiles_ShouldMapEntities() {
+        Profile profile = Profile.builder()
+                .id(UUID.randomUUID())
+                .username("user")
+                .password("pwd")
+                .fullName("User Name")
+                .phone("+70000000000")
+                .position("Inspector")
+                .role("ROLE_INSPECTOR")
+                .isActive(true)
+                .build();
+        when(profileRepository.findAll()).thenReturn(List.of(profile));
+
+        assertEquals(1, profileService.getAllProfiles().size());
     }
 }

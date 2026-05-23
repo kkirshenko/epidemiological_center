@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Organization.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.model</a> &gt; <span class="el_source">Organization.java</span></div><h1>Organization.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.model;
+
+import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+/**
+ * Entity representing an organization subject to sanitary inspection.
+ */
+@Entity
+@Table(name = &quot;organizations&quot;)
+<span class="pc bnc" id="L21" title="All 142 branches missed.">@Data</span>
+<span class="fc" id="L22">@NoArgsConstructor</span>
+<span class="fc" id="L23">@AllArgsConstructor</span>
+<span class="pc bpc" id="L24" title="1 of 8 branches missed.">@Builder</span>
+public class Organization {
+
+    @Id
+    @Column(columnDefinition = &quot;uuid&quot;)
+<span class="fc" id="L29">    private UUID id;</span>
+
+    @Column(name = &quot;name&quot;, nullable = false)
+<span class="fc" id="L32">    private String name;</span>
+
+    @Column(name = &quot;short_name&quot;, nullable = false)
+<span class="fc" id="L35">    private String shortName;</span>
+
+    @Column(name = &quot;registration_number&quot;, unique = true)
+<span class="fc" id="L38">    private String registrationNumber;</span>
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;type_id&quot;, nullable = false)
+<span class="fc" id="L42">    private OrganizationType type;</span>
+
+    @Column(name = &quot;address&quot;, nullable = false)
+<span class="fc" id="L45">    private String address;</span>
+
+    @Column(name = &quot;city&quot;, nullable = false)
+<span class="fc" id="L48">    private String city;</span>
+
+    @Column(name = &quot;director_name&quot;, nullable = false)
+<span class="fc" id="L51">    private String directorName;</span>
+
+    @Column(name = &quot;phone&quot;, nullable = false)
+<span class="fc" id="L54">    private String phone;</span>
+
+    @Column(name = &quot;email&quot;, nullable = false)
+<span class="fc" id="L57">    private String email;</span>
+
+    @Column(name = &quot;employee_count&quot;, nullable = false)
+    @Builder.Default
+<span class="fc" id="L61">    private Integer employeeCount = 0;</span>
+
+    @Column(name = &quot;risk_category&quot;, nullable = false, length = 20)
+    @Builder.Default
+<span class="fc" id="L65">    private String riskCategory = &quot;medium&quot;;</span>
+
+    @Column(name = &quot;is_active&quot;, nullable = false)
+    @Builder.Default
+<span class="fc" id="L69">    private Boolean isActive = true;</span>
+
+    @Column(name = &quot;notes&quot;, nullable = false, columnDefinition = &quot;text&quot;)
+<span class="fc" id="L72">    private String notes;</span>
+
+    @OneToMany(mappedBy = &quot;organization&quot;, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    @JsonIgnore
+<span class="fc" id="L77">    private List&lt;Inspection&gt; inspections = new ArrayList&lt;&gt;();</span>
+
+    @CreationTimestamp
+    @Column(name = &quot;created_at&quot;, updatable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+<span class="nc" id="L83">    private LocalDateTime createdAt;</span>
+
+    @UpdateTimestamp
+    @Column(name = &quot;updated_at&quot;)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+<span class="nc" id="L89">    private LocalDateTime updatedAt;</span>
+
+    @PrePersist
+    private void ensureId() {
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (id == null) {</span>
+<span class="fc" id="L94">            id = UUID.randomUUID();</span>
+        }
+<span class="fc" id="L96">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

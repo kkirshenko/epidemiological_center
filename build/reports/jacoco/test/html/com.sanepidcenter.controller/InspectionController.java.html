@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InspectionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.controller</a> &gt; <span class="el_source">InspectionController.java</span></div><h1>InspectionController.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.controller;
+
+import com.sanepidcenter.model.Inspection;
+import com.sanepidcenter.repository.InspectionTypeRepository;
+import com.sanepidcenter.repository.ProfileRepository;
+import com.sanepidcenter.service.InspectionService;
+import com.sanepidcenter.service.OrganizationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@Controller
+@RequestMapping(&quot;/inspections&quot;)
+<span class="fc" id="L18">@RequiredArgsConstructor</span>
+public class InspectionController {
+
+    private final InspectionService inspectionService;
+    private final OrganizationService organizationService;
+    private final InspectionTypeRepository inspectionTypeRepository;
+    private final ProfileRepository profileRepository;
+
+    @GetMapping
+    public String listInspections(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDir,
+            Model model) {
+        List&lt;Inspection&gt; inspections;
+<span class="pc bpc" id="L33" title="2 of 4 branches missed.">        if (query != null &amp;&amp; !query.isEmpty()) {</span>
+<span class="fc" id="L34">            inspections = inspectionService.searchAllFields(query);</span>
+        } else {
+<span class="nc" id="L36">            inspections = inspectionService.getAllInspections();</span>
+        }
+        
+<span class="pc bpc" id="L39" title="2 of 4 branches missed.">        if (sortBy != null &amp;&amp; !sortBy.isEmpty()) {</span>
+<span class="fc" id="L40">            inspections = inspectionService.sortInspections(inspections, sortBy, sortDir);</span>
+        }
+        
+<span class="fc" id="L43">        model.addAttribute(&quot;inspections&quot;, inspections);</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        model.addAttribute(&quot;query&quot;, query != null ? query : &quot;&quot;);</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        model.addAttribute(&quot;sortBy&quot;, sortBy != null ? sortBy : &quot;&quot;);</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">        model.addAttribute(&quot;sortDir&quot;, sortDir != null ? sortDir : &quot;asc&quot;);</span>
+<span class="fc" id="L47">        return &quot;inspections/list&quot;;</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public String viewInspection(@PathVariable UUID id, Model model) {
+<span class="fc" id="L52">        return inspectionService.getInspectionById(id)</span>
+<span class="fc" id="L53">                .map(inspection -&gt; {</span>
+<span class="fc" id="L54">                    model.addAttribute(&quot;inspection&quot;, inspection);</span>
+<span class="fc" id="L55">                    return &quot;inspections/view&quot;;</span>
+                })
+<span class="fc" id="L57">                .orElse(&quot;redirect:/inspections&quot;);</span>
+    }
+
+    @GetMapping(&quot;/new&quot;)
+    public String newInspectionForm(Model model) {
+<span class="nc" id="L62">        model.addAttribute(&quot;inspection&quot;, new Inspection());</span>
+<span class="nc" id="L63">        enrichFormModel(model);</span>
+<span class="nc" id="L64">        return &quot;inspections/form&quot;;</span>
+    }
+
+    @PostMapping
+    public String createInspection(@ModelAttribute Inspection inspection) {
+        try {
+<span class="nc" id="L70">            inspectionService.createInspection(inspection);</span>
+<span class="nc" id="L71">            return &quot;redirect:/inspections&quot;;</span>
+<span class="fc" id="L72">        } catch (RuntimeException e) {</span>
+<span class="fc" id="L73">            return &quot;redirect:/inspections/new?error=save_failed&quot;;</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}/edit&quot;)
+    public String editInspectionForm(@PathVariable UUID id, Model model) {
+<span class="fc" id="L79">        return inspectionService.getInspectionById(id)</span>
+<span class="fc" id="L80">                .map(inspection -&gt; {</span>
+<span class="pc bpc" id="L81" title="2 of 4 branches missed.">                    if (inspection.getScheduledDate() == null &amp;&amp; inspection.getStartDate() != null) {</span>
+<span class="fc" id="L82">                        inspection.setScheduledDate(inspection.getStartDate());</span>
+                    }
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">                    if (inspection.getScheduledDate() == null) {</span>
+<span class="nc" id="L85">                        inspection.setScheduledDate(java.time.LocalDate.now());</span>
+                    }
+<span class="fc" id="L87">                    model.addAttribute(&quot;inspection&quot;, inspection);</span>
+<span class="fc" id="L88">                    enrichFormModel(model);</span>
+<span class="fc" id="L89">                    return &quot;inspections/form&quot;;</span>
+                })
+<span class="fc" id="L91">                .orElse(&quot;redirect:/inspections&quot;);</span>
+    }
+
+    @PostMapping(&quot;/{id}&quot;)
+    public String updateInspection(@PathVariable UUID id, @ModelAttribute Inspection inspection) {
+        try {
+<span class="nc" id="L97">            inspectionService.updateInspection(id, inspection);</span>
+<span class="nc" id="L98">            return &quot;redirect:/inspections&quot;;</span>
+<span class="fc" id="L99">        } catch (RuntimeException e) {</span>
+<span class="fc" id="L100">            return &quot;redirect:/inspections/&quot; + id + &quot;/edit?error=save_failed&quot;;</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/delete&quot;)
+    public String deleteInspection(@PathVariable UUID id) {
+<span class="fc" id="L106">        inspectionService.deleteInspection(id);</span>
+<span class="fc" id="L107">        return &quot;redirect:/inspections&quot;;</span>
+    }
+
+    @GetMapping(&quot;/planned&quot;)
+    public String listPlannedInspections(Model model) {
+<span class="fc" id="L112">        List&lt;Inspection&gt; inspections = inspectionService.getPlannedInspections();</span>
+<span class="fc" id="L113">        model.addAttribute(&quot;inspections&quot;, inspections);</span>
+<span class="fc" id="L114">        return &quot;inspections/list&quot;;</span>
+    }
+
+    private void enrichFormModel(Model model) {
+<span class="fc" id="L118">        model.addAttribute(&quot;organizations&quot;, organizationService.getAllOrganizations());</span>
+<span class="fc" id="L119">        model.addAttribute(&quot;inspectionTypes&quot;, inspectionTypeRepository.findAll());</span>
+<span class="fc" id="L120">        model.addAttribute(&quot;inspectors&quot;, profileRepository.findAll().stream()</span>
+<span class="fc" id="L121">                .filter(profile -&gt; &quot;ROLE_INSPECTOR&quot;.equals(profile.getRole()))</span>
+<span class="fc" id="L122">                .toList());</span>
+<span class="fc" id="L123">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

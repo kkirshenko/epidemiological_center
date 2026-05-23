@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.config.SecurityConfigTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:21.454Z" hostname="VITALPC" time="1.316">
+  <properties/>
+  <testcase name="authenticationManager_ShouldDelegateToAuthenticationConfiguration()" classname="com.sanepidcenter.config.SecurityConfigTest" time="0.194"/>
+  <testcase name="passwordEncoder_ShouldEncodeAndMatchBcryptAndPlainText()" classname="com.sanepidcenter.config.SecurityConfigTest" time="1.049"/>
+  <testcase name="corsConfigurationSource_ShouldContainExpectedDefaultConfiguration()" classname="com.sanepidcenter.config.SecurityConfigTest" time="0.069"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

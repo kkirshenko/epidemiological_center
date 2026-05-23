@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.service.OrganizationServiceTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:24.574Z" hostname="VITALPC" time="0.022">
+  <properties/>
+  <testcase name="updateOrganization_WhenNotFound_ShouldThrow()" classname="com.sanepidcenter.service.OrganizationServiceTest" time="0.003"/>
+  <testcase name="getOrganizationById_WhenExists_ShouldReturnOrganization()" classname="com.sanepidcenter.service.OrganizationServiceTest" time="0.001"/>
+  <testcase name="getAllOrganizations_ShouldReturnList()" classname="com.sanepidcenter.service.OrganizationServiceTest" time="0.002"/>
+  <testcase name="sortOrganizations_ByNameDescending_ShouldSort()" classname="com.sanepidcenter.service.OrganizationServiceTest" time="0.003"/>
+  <testcase name="deleteOrganization_ShouldCallRepository()" classname="com.sanepidcenter.service.OrganizationServiceTest" time="0.003"/>
+  <testcase name="createOrganization_WithoutType_ShouldThrow()" classname="com.sanepidcenter.service.OrganizationServiceTest" time="0.003"/>
+  <testcase name="createOrganization_ShouldResolveTypeAndSave()" classname="com.sanepidcenter.service.OrganizationServiceTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

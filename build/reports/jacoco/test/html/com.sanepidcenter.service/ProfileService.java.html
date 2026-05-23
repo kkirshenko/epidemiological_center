@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfileService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.service</a> &gt; <span class="el_source">ProfileService.java</span></div><h1>ProfileService.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.service;
+
+import com.sanepidcenter.dto.ProfileDto;
+import com.sanepidcenter.model.Profile;
+import com.sanepidcenter.repository.ProfileRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+/**
+ * Service for managing user profiles.
+ */
+@Service
+<span class="fc" id="L19">@RequiredArgsConstructor</span>
+public class ProfileService {
+
+    private final ProfileRepository profileRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public List&lt;ProfileDto&gt; getAllProfiles() {
+<span class="fc" id="L26">        return profileRepository.findAll().stream()</span>
+<span class="fc" id="L27">                .map(this::toDto)</span>
+<span class="fc" id="L28">                .collect(Collectors.toList());</span>
+    }
+
+    public ProfileDto getProfileById(UUID id) {
+<span class="fc" id="L32">        return profileRepository.findById(id)</span>
+<span class="fc" id="L33">                .map(this::toDto)</span>
+<span class="fc" id="L34">                .orElse(null);</span>
+    }
+
+    public ProfileDto getProfileByUsername(String username) {
+<span class="nc" id="L38">        return profileRepository.findByUsername(username)</span>
+<span class="nc" id="L39">                .map(this::toDto)</span>
+<span class="nc" id="L40">                .orElse(null);</span>
+    }
+
+    @Transactional
+    public ProfileDto createProfile(ProfileDto dto, String rawPassword) {
+<span class="fc" id="L45">        Profile profile = new Profile();</span>
+<span class="fc" id="L46">        profile.setId(UUID.randomUUID());</span>
+<span class="fc" id="L47">        profile.setUsername(dto.getUsername());</span>
+<span class="fc" id="L48">        profile.setPassword(passwordEncoder.encode(rawPassword));</span>
+<span class="fc" id="L49">        profile.setFullName(dto.getFullName());</span>
+<span class="fc" id="L50">        profile.setPhone(dto.getPhone());</span>
+<span class="fc" id="L51">        profile.setPosition(dto.getPosition());</span>
+<span class="fc" id="L52">        profile.setRole(dto.getRole());</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        profile.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);</span>
+        
+<span class="fc" id="L55">        profileRepository.save(profile);</span>
+<span class="fc" id="L56">        return toDto(profile);</span>
+    }
+
+    @Transactional
+    public ProfileDto updateProfile(UUID id, ProfileDto dto) {
+<span class="fc" id="L61">        Profile profile = profileRepository.findById(id)</span>
+<span class="pc" id="L62">                .orElseThrow(() -&gt; new RuntimeException(&quot;Profile not found with id: &quot; + id));</span>
+        
+<span class="fc" id="L64">        profile.setFullName(dto.getFullName());</span>
+<span class="fc" id="L65">        profile.setPhone(dto.getPhone());</span>
+<span class="fc" id="L66">        profile.setPosition(dto.getPosition());</span>
+<span class="fc" id="L67">        profile.setRole(dto.getRole());</span>
+<span class="fc" id="L68">        profile.setIsActive(dto.getIsActive());</span>
+        
+<span class="fc" id="L70">        profileRepository.save(profile);</span>
+<span class="fc" id="L71">        return toDto(profile);</span>
+    }
+
+    @Transactional
+    public void deleteProfile(UUID id) {
+<span class="nc" id="L76">        profileRepository.deleteById(id);</span>
+<span class="nc" id="L77">    }</span>
+
+    @Transactional
+    public void toggleProfileStatus(UUID id) {
+<span class="nc" id="L81">        Profile profile = profileRepository.findById(id)</span>
+<span class="nc" id="L82">                .orElseThrow(() -&gt; new RuntimeException(&quot;Profile not found with id: &quot; + id));</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        profile.setIsActive(!profile.getIsActive());</span>
+<span class="nc" id="L84">        profileRepository.save(profile);</span>
+<span class="nc" id="L85">    }</span>
+
+    private ProfileDto toDto(Profile profile) {
+<span class="fc" id="L88">        ProfileDto dto = new ProfileDto();</span>
+<span class="fc" id="L89">        dto.setId(profile.getId());</span>
+<span class="fc" id="L90">        dto.setUsername(profile.getUsername());</span>
+<span class="fc" id="L91">        dto.setFullName(profile.getFullName());</span>
+<span class="fc" id="L92">        dto.setPhone(profile.getPhone());</span>
+<span class="fc" id="L93">        dto.setPosition(profile.getPosition());</span>
+<span class="fc" id="L94">        dto.setRole(profile.getRole());</span>
+<span class="fc" id="L95">        dto.setIsActive(profile.getIsActive());</span>
+<span class="fc" id="L96">        dto.setCreatedAt(profile.getCreatedAt());</span>
+<span class="fc" id="L97">        dto.setUpdatedAt(profile.getUpdatedAt());</span>
+<span class="fc" id="L98">        return dto;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

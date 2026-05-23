@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.controller.AdminApiControllerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:23.175Z" hostname="VITALPC" time="0.311">
+  <properties/>
+  <testcase name="usersCrudAndMetrics()" classname="com.sanepidcenter.controller.AdminApiControllerTest" time="0.308"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

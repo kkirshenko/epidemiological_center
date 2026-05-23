@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ViolationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.controller</a> &gt; <span class="el_source">ViolationController.java</span></div><h1>ViolationController.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.controller;
+
+import com.sanepidcenter.service.InspectionService;
+import com.sanepidcenter.service.ViolationService;
+import com.sanepidcenter.repository.InspectionRepository;
+import com.sanepidcenter.repository.ViolationRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.UUID;
+
+@Controller
+@RequestMapping(&quot;/violations&quot;)
+<span class="fc" id="L24">@RequiredArgsConstructor</span>
+public class ViolationController {
+
+    private final ViolationService violationService;
+    private final InspectionService inspectionService;
+    private final InspectionRepository inspectionRepository;
+    private final ViolationRepository violationRepository;
+
+    @GetMapping
+    public String listViolations(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDir,
+            Model model) {
+        List&lt;com.sanepidcenter.model.Violation&gt; violations;
+<span class="pc bpc" id="L39" title="3 of 4 branches missed.">        if (query != null &amp;&amp; !query.isEmpty()) {</span>
+<span class="nc" id="L40">            violations = violationService.searchAllFields(query);</span>
+        } else {
+<span class="fc" id="L42">            violations = violationService.getAllViolations();</span>
+        }
+        
+<span class="pc bpc" id="L45" title="3 of 4 branches missed.">        if (sortBy != null &amp;&amp; !sortBy.isEmpty()) {</span>
+<span class="nc" id="L46">            violations = violationService.sortViolations(violations, sortBy, sortDir);</span>
+        }
+        
+<span class="fc" id="L49">        model.addAttribute(&quot;violations&quot;, violations);</span>
+<span class="fc" id="L50">        model.addAttribute(&quot;inspections&quot;, inspectionService.getAllInspections());</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        model.addAttribute(&quot;query&quot;, query != null ? query : &quot;&quot;);</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        model.addAttribute(&quot;sortBy&quot;, sortBy != null ? sortBy : &quot;&quot;);</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        model.addAttribute(&quot;sortDir&quot;, sortDir != null ? sortDir : &quot;asc&quot;);</span>
+<span class="fc" id="L54">        return &quot;violations/list&quot;;</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public String viewViolation(@PathVariable UUID id, Model model) {
+<span class="fc" id="L59">        return violationService.getViolationById(id)</span>
+<span class="fc" id="L60">                .map(violation -&gt; {</span>
+<span class="fc" id="L61">                    Long resolutionDays = null;</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">                    if (Boolean.TRUE.equals(violation.getResolved())</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">                            &amp;&amp; violation.getCreatedAt() != null</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">                            &amp;&amp; violation.getCorrectionDeadline() != null) {</span>
+<span class="fc" id="L65">                        resolutionDays = ChronoUnit.DAYS.between(</span>
+<span class="fc" id="L66">                                violation.getCreatedAt().toLocalDate(),</span>
+<span class="fc" id="L67">                                violation.getCorrectionDeadline());</span>
+                    }
+<span class="fc" id="L69">                    model.addAttribute(&quot;violation&quot;, violation);</span>
+<span class="fc" id="L70">                    model.addAttribute(&quot;resolutionDays&quot;, resolutionDays);</span>
+<span class="fc" id="L71">                    return &quot;violations/view&quot;;</span>
+                })
+<span class="fc" id="L73">                .orElse(&quot;redirect:/violations&quot;);</span>
+    }
+
+    @GetMapping(&quot;/new&quot;)
+    public String newViolationForm(Model model) {
+<span class="nc" id="L78">        model.addAttribute(&quot;violation&quot;, new com.sanepidcenter.model.Violation());</span>
+<span class="nc" id="L79">        model.addAttribute(&quot;inspections&quot;, inspectionService.getAllInspections());</span>
+<span class="nc" id="L80">        return &quot;violations/form&quot;;</span>
+    }
+
+    @PostMapping
+    public String createViolation(
+            @RequestParam UUID inspectionId,
+            @RequestParam String description,
+            @RequestParam String severity,
+            RedirectAttributes redirectAttributes) {
+        try {
+<span class="fc" id="L90">            com.sanepidcenter.model.Violation violation = new com.sanepidcenter.model.Violation();</span>
+<span class="fc" id="L91">            violation.setInspection(inspectionRepository.findById(inspectionId)</span>
+<span class="fc" id="L92">                    .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Inspection not found&quot;)));</span>
+<span class="fc" id="L93">            violation.setDescription(description);</span>
+<span class="fc" id="L94">            violation.setSeverity(severity);</span>
+<span class="fc" id="L95">            violation.setCode(&quot;N/A&quot;);</span>
+<span class="fc" id="L96">            violation.setArticleReference(&quot;Не указана&quot;);</span>
+<span class="fc" id="L97">            violation.setResolutionNotes(&quot;&quot;);</span>
+<span class="fc" id="L98">            violation.setCorrectionDeadline(null);</span>
+<span class="fc" id="L99">            violation.setResolved(false);</span>
+<span class="fc" id="L100">            violationRepository.save(violation);</span>
+<span class="fc" id="L101">            redirectAttributes.addFlashAttribute(&quot;successMessage&quot;, &quot;Нарушение успешно добавлено&quot;);</span>
+<span class="fc" id="L102">        } catch (Exception e) {</span>
+<span class="fc" id="L103">            redirectAttributes.addFlashAttribute(&quot;errorMessage&quot;, &quot;Ошибка при добавлении нарушения: &quot; + e.getMessage());</span>
+<span class="fc" id="L104">        }</span>
+<span class="fc" id="L105">        return &quot;redirect:/violations&quot;;</span>
+    }
+
+    @GetMapping(&quot;/{id}/edit&quot;)
+    public String editViolationForm(@PathVariable UUID id, Model model) {
+<span class="nc" id="L110">        return violationService.getViolationById(id)</span>
+<span class="nc" id="L111">                .map(violation -&gt; {</span>
+<span class="nc" id="L112">                    model.addAttribute(&quot;violation&quot;, violation);</span>
+<span class="nc" id="L113">                    model.addAttribute(&quot;inspections&quot;, inspectionService.getAllInspections());</span>
+<span class="nc" id="L114">                    return &quot;violations/form&quot;;</span>
+                })
+<span class="nc" id="L116">                .orElse(&quot;redirect:/violations&quot;);</span>
+    }
+
+    @PostMapping(&quot;/{id}/edit&quot;)
+    public String updateViolation(
+            @PathVariable UUID id,
+            @RequestParam UUID inspectionId,
+            @RequestParam String description,
+            @RequestParam String severity,
+            @RequestParam(required = false) Boolean resolved,
+            RedirectAttributes redirectAttributes) {
+        try {
+<span class="fc" id="L128">            com.sanepidcenter.model.Violation violationDetails = new com.sanepidcenter.model.Violation();</span>
+<span class="fc" id="L129">            violationDetails.setInspection(inspectionRepository.findById(inspectionId)</span>
+<span class="pc" id="L130">                    .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Inspection not found&quot;)));</span>
+<span class="fc" id="L131">            violationDetails.setDescription(description);</span>
+<span class="fc" id="L132">            violationDetails.setSeverity(severity);</span>
+<span class="fc" id="L133">            violationDetails.setCode(&quot;N/A&quot;);</span>
+<span class="fc" id="L134">            violationDetails.setArticleReference(&quot;Не указана&quot;);</span>
+<span class="fc" id="L135">            violationDetails.setResolutionNotes(&quot;&quot;);</span>
+<span class="pc bpc" id="L136" title="2 of 4 branches missed.">            violationDetails.setResolved(resolved != null &amp;&amp; resolved);</span>
+            
+<span class="fc" id="L138">            violationService.updateViolation(id, violationDetails);</span>
+<span class="fc" id="L139">            redirectAttributes.addFlashAttribute(&quot;successMessage&quot;, &quot;Нарушение успешно обновлено&quot;);</span>
+<span class="nc" id="L140">        } catch (Exception e) {</span>
+<span class="nc" id="L141">            redirectAttributes.addFlashAttribute(&quot;errorMessage&quot;, &quot;Ошибка при обновлении нарушения: &quot; + e.getMessage());</span>
+<span class="fc" id="L142">        }</span>
+<span class="fc" id="L143">        return &quot;redirect:/violations&quot;;</span>
+    }
+
+    @PostMapping(&quot;/{id}/delete&quot;)
+    public String deleteViolation(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
+        try {
+<span class="fc" id="L149">            violationService.deleteViolation(id);</span>
+<span class="fc" id="L150">            redirectAttributes.addFlashAttribute(&quot;successMessage&quot;, &quot;Нарушение успешно удалено&quot;);</span>
+<span class="nc" id="L151">        } catch (Exception e) {</span>
+<span class="nc" id="L152">            redirectAttributes.addFlashAttribute(&quot;errorMessage&quot;, &quot;Ошибка при удалении нарушения: &quot; + e.getMessage());</span>
+<span class="fc" id="L153">        }</span>
+<span class="fc" id="L154">        return &quot;redirect:/violations&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -147,4 +147,35 @@ class InspectionServiceTest {
         assertEquals(1, result.size());
         assertEquals("planned", result.get(0).getStatus());
     }
+
+    @Test
+    void createInspection_WithoutScheduledDate_ShouldThrow() {
+        testInspection.setScheduledDate(null);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> inspectionService.createInspection(testInspection));
+
+        assertTrue(exception.getMessage().contains("Scheduled date is required"));
+    }
+
+    @Test
+    void sortInspections_ByOrganizationAscending_ShouldSort() {
+        Organization secondOrg = Organization.builder().id(UUID.randomUUID()).name("Beta").build();
+        Inspection second = Inspection.builder().id(UUID.randomUUID()).organization(secondOrg).scheduledDate(LocalDate.now()).status("planned").result("pending").build();
+
+        List<Inspection> result = inspectionService.sortInspections(List.of(second, testInspection), "organization", "asc");
+
+        assertEquals("Beta", result.get(0).getOrganization().getName());
+    }
+
+    @Test
+    void updateInspection_WhenMissing_ShouldThrow() {
+        UUID id = UUID.randomUUID();
+        when(inspectionRepository.findById(id)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> inspectionService.updateInspection(id, testInspection));
+
+        assertTrue(exception.getMessage().contains("Inspection not found"));
+    }
 }

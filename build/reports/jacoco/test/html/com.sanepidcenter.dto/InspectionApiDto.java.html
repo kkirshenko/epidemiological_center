@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InspectionApiDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.dto</a> &gt; <span class="el_source">InspectionApiDto.java</span></div><h1>InspectionApiDto.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.dto;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+<span class="nc bnc" id="L10" title="All 142 branches missed.">@Data</span>
+<span class="pc" id="L11">@Builder</span>
+public class InspectionApiDto {
+<span class="nc" id="L13">    private UUID id;</span>
+<span class="nc" id="L14">    private UUID organizationId;</span>
+<span class="nc" id="L15">    private String organizationName;</span>
+<span class="nc" id="L16">    private Integer typeId;</span>
+<span class="nc" id="L17">    private String typeName;</span>
+<span class="nc" id="L18">    private UUID inspectorId;</span>
+<span class="nc" id="L19">    private String inspectorName;</span>
+<span class="nc" id="L20">    private LocalDate scheduledDate;</span>
+<span class="nc" id="L21">    private LocalDate startDate;</span>
+<span class="nc" id="L22">    private LocalDate endDate;</span>
+<span class="fc" id="L23">    private String status;</span>
+<span class="nc" id="L24">    private String result;</span>
+<span class="nc" id="L25">    private String findingsSummary;</span>
+<span class="nc" id="L26">    private String recommendations;</span>
+<span class="fc" id="L27">    private String actNumber;</span>
+<span class="nc" id="L28">    private LocalDateTime createdAt;</span>
+<span class="nc" id="L29">    private LocalDateTime updatedAt;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

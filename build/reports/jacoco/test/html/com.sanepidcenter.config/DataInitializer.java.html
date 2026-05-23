@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataInitializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.config</a> &gt; <span class="el_source">DataInitializer.java</span></div><h1>DataInitializer.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.config;
+
+import com.sanepidcenter.model.InspectionType;
+import com.sanepidcenter.model.OrganizationType;
+import com.sanepidcenter.model.Profile;
+import com.sanepidcenter.repository.InspectionTypeRepository;
+import com.sanepidcenter.repository.OrganizationTypeRepository;
+import com.sanepidcenter.repository.ProfileRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
+import java.util.UUID;
+
+@Configuration
+<span class="fc" id="L19">@RequiredArgsConstructor</span>
+public class DataInitializer {
+
+    private final OrganizationTypeRepository organizationTypeRepository;
+    private final InspectionTypeRepository inspectionTypeRepository;
+    private final ProfileRepository profileRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Bean
+    public CommandLineRunner seedInitialData() {
+<span class="fc" id="L29">        return args -&gt; {</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">            if (organizationTypeRepository.count() == 0) {</span>
+<span class="fc" id="L31">                organizationTypeRepository.saveAll(List.of(</span>
+<span class="fc" id="L32">                        OrganizationType.builder().name(&quot;Предприятие общественного питания&quot;).description(&quot;Рестораны, кафе, столовые, буфеты&quot;).build(),</span>
+<span class="fc" id="L33">                        OrganizationType.builder().name(&quot;Пищевое производство&quot;).description(&quot;Заводы и цеха по производству продуктов питания&quot;).build(),</span>
+<span class="fc" id="L34">                        OrganizationType.builder().name(&quot;Медицинское учреждение&quot;).description(&quot;Больницы, поликлиники, лаборатории&quot;).build(),</span>
+<span class="fc" id="L35">                        OrganizationType.builder().name(&quot;Детское учреждение&quot;).description(&quot;Детские сады, школы, лагеря&quot;).build(),</span>
+<span class="fc" id="L36">                        OrganizationType.builder().name(&quot;Промышленное предприятие&quot;).description(&quot;Заводы, фабрики, производственные объекты&quot;).build(),</span>
+<span class="fc" id="L37">                        OrganizationType.builder().name(&quot;Торговое предприятие&quot;).description(&quot;Магазины, супермаркеты, рынки&quot;).build(),</span>
+<span class="fc" id="L38">                        OrganizationType.builder().name(&quot;Объект водоснабжения&quot;).description(&quot;Водозаборы, очистные станции, сети&quot;).build(),</span>
+<span class="fc" id="L39">                        OrganizationType.builder().name(&quot;Прочее&quot;).description(&quot;Иные объекты санитарного надзора&quot;).build()</span>
+                ));
+            }
+
+<span class="fc bfc" id="L43" title="All 2 branches covered.">            if (inspectionTypeRepository.count() == 0) {</span>
+<span class="fc" id="L44">                inspectionTypeRepository.saveAll(List.of(</span>
+<span class="fc" id="L45">                        InspectionType.builder().name(&quot;Плановая проверка&quot;).code(&quot;PLAN&quot;).description(&quot;Проверка согласно утверждённому плану&quot;).build(),</span>
+<span class="fc" id="L46">                        InspectionType.builder().name(&quot;Внеплановая проверка&quot;).code(&quot;UNPLAN&quot;).description(&quot;Проверка по жалобам или обращениям&quot;).build(),</span>
+<span class="fc" id="L47">                        InspectionType.builder().name(&quot;Повторная проверка&quot;).code(&quot;REPEAT&quot;).description(&quot;Проверка устранения ранее выявленных нарушений&quot;).build(),</span>
+<span class="fc" id="L48">                        InspectionType.builder().name(&quot;Рейдовая проверка&quot;).code(&quot;RAID&quot;).description(&quot;Массовые проверки однотипных объектов&quot;).build(),</span>
+<span class="fc" id="L49">                        InspectionType.builder().name(&quot;Мониторинговая проверка&quot;).code(&quot;MONITOR&quot;).description(&quot;Систематический сбор данных без санкций&quot;).build()</span>
+                ));
+            }
+
+<span class="fc" id="L53">            var adminOpt = profileRepository.findByUsername(&quot;admin1&quot;);</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">            if (adminOpt.isEmpty()) {</span>
+<span class="fc" id="L55">                profileRepository.save(Profile.builder()</span>
+<span class="fc" id="L56">                        .id(UUID.randomUUID())</span>
+<span class="fc" id="L57">                        .username(&quot;admin1&quot;)</span>
+<span class="fc" id="L58">                        .password(passwordEncoder.encode(&quot;admin1&quot;))</span>
+<span class="fc" id="L59">                        .fullName(&quot;Системный администратор&quot;)</span>
+<span class="fc" id="L60">                        .role(&quot;ROLE_ADMIN&quot;)</span>
+<span class="fc" id="L61">                        .phone(&quot;&quot;)</span>
+<span class="fc" id="L62">                        .position(&quot;Администратор&quot;)</span>
+<span class="fc" id="L63">                        .isActive(true)</span>
+<span class="fc" id="L64">                        .build());</span>
+            } else {
+<span class="fc" id="L66">                Profile admin = adminOpt.get();</span>
+<span class="fc" id="L67">                boolean changed = false;</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">                if (!&quot;ROLE_ADMIN&quot;.equals(admin.getRole())) {</span>
+<span class="fc" id="L69">                    admin.setRole(&quot;ROLE_ADMIN&quot;);</span>
+<span class="fc" id="L70">                    changed = true;</span>
+                }
+<span class="fc bfc" id="L72" title="All 4 branches covered.">                if (admin.getIsActive() == null || !admin.getIsActive()) {</span>
+<span class="fc" id="L73">                    admin.setIsActive(true);</span>
+<span class="fc" id="L74">                    changed = true;</span>
+                }
+<span class="fc bfc" id="L76" title="All 2 branches covered.">                if (changed) {</span>
+<span class="fc" id="L77">                    profileRepository.save(admin);</span>
+                }
+            }
+<span class="fc" id="L80">        };</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

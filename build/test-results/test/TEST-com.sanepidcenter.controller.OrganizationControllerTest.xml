@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.controller.OrganizationControllerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:23.632Z" hostname="VITALPC" time="0.011">
+  <properties/>
+  <testcase name="viewAndEditForms_ShouldHandlePresentAndMissing()" classname="com.sanepidcenter.controller.OrganizationControllerTest" time="0.005"/>
+  <testcase name="listOrganizations_WithQueryAndSort_ShouldUseSearchAndSort()" classname="com.sanepidcenter.controller.OrganizationControllerTest" time="0.003"/>
+  <testcase name="createUpdateDeleteAndSearch_ShouldReturnRedirects()" classname="com.sanepidcenter.controller.OrganizationControllerTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

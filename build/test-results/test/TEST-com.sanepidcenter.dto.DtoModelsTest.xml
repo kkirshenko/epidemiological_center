@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.dto.DtoModelsTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:23.728Z" hostname="VITALPC" time="0.011">
+  <properties/>
+  <testcase name="authAndLoginRequests_BuilderAndConstructorsShouldWork()" classname="com.sanepidcenter.dto.DtoModelsTest" time="0.006"/>
+  <testcase name="adminUserCreateRequest_DefaultAndSettersShouldWork()" classname="com.sanepidcenter.dto.DtoModelsTest" time="0.0"/>
+  <testcase name="apiDtos_BuildersShouldPopulateAllFields()" classname="com.sanepidcenter.dto.DtoModelsTest" time="0.0"/>
+  <testcase name="organizationAndProfileDtos_ConstructorsEqualsAndHashCodeShouldWork()" classname="com.sanepidcenter.dto.DtoModelsTest" time="0.0"/>
+  <testcase name="adminUserUpdateRequest_DefaultAndSettersShouldWork()" classname="com.sanepidcenter.dto.DtoModelsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

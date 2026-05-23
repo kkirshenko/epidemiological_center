@@ -61,7 +61,6 @@ public class InspectionController {
     public String newInspectionForm(Model model) {
         model.addAttribute("inspection", new Inspection());
         enrichFormModel(model);
-        filterInspectors(model);
         return "inspections/form";
     }
 
@@ -87,7 +86,6 @@ public class InspectionController {
                     }
                     model.addAttribute("inspection", inspection);
                     enrichFormModel(model);
-                    filterInspectors(model);
                     return "inspections/form";
                 })
                 .orElse("redirect:/inspections");
@@ -119,16 +117,8 @@ public class InspectionController {
     private void enrichFormModel(Model model) {
         model.addAttribute("organizations", organizationService.getAllOrganizations());
         model.addAttribute("inspectionTypes", inspectionTypeRepository.findAll());
-        model.addAttribute("inspectors", profileRepository.findAll());
-    }
-
-    private void filterInspectors(Model model) {
-        var allProfiles = (java.util.List<com.sanepidcenter.model.Profile>) model.getAttribute("inspectors");
-        if (allProfiles != null) {
-            var filteredInspectors = allProfiles.stream()
-                .filter(p -> "ROLE_INSPECTOR".equals(p.getRole()))
-                .toList();
-            model.addAttribute("inspectors", filteredInspectors);
-        }
+        model.addAttribute("inspectors", profileRepository.findAll().stream()
+                .filter(profile -> "ROLE_INSPECTOR".equals(profile.getRole()))
+                .toList());
     }
 }

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrganizationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.controller</a> &gt; <span class="el_source">OrganizationController.java</span></div><h1>OrganizationController.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.controller;
+
+import com.sanepidcenter.model.Organization;
+import com.sanepidcenter.repository.OrganizationTypeRepository;
+import com.sanepidcenter.service.OrganizationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@Controller
+@RequestMapping(&quot;/organizations&quot;)
+<span class="fc" id="L16">@RequiredArgsConstructor</span>
+public class OrganizationController {
+
+    private final OrganizationService organizationService;
+    private final OrganizationTypeRepository organizationTypeRepository;
+
+    @GetMapping
+    public String listOrganizations(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDir,
+            Model model) {
+        List&lt;Organization&gt; organizations;
+<span class="pc bpc" id="L29" title="2 of 4 branches missed.">        if (query != null &amp;&amp; !query.isEmpty()) {</span>
+<span class="fc" id="L30">            organizations = organizationService.searchAllFields(query);</span>
+        } else {
+<span class="nc" id="L32">            organizations = organizationService.getAllOrganizations();</span>
+        }
+        
+<span class="pc bpc" id="L35" title="2 of 4 branches missed.">        if (sortBy != null &amp;&amp; !sortBy.isEmpty()) {</span>
+<span class="fc" id="L36">            organizations = organizationService.sortOrganizations(organizations, sortBy, sortDir);</span>
+        }
+        
+<span class="fc" id="L39">        model.addAttribute(&quot;organizations&quot;, organizations);</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        model.addAttribute(&quot;query&quot;, query != null ? query : &quot;&quot;);</span>
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">        model.addAttribute(&quot;sortBy&quot;, sortBy != null ? sortBy : &quot;&quot;);</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        model.addAttribute(&quot;sortDir&quot;, sortDir != null ? sortDir : &quot;asc&quot;);</span>
+<span class="fc" id="L43">        return &quot;organizations/list&quot;;</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public String viewOrganization(@PathVariable UUID id, Model model) {
+<span class="fc" id="L48">        return organizationService.getOrganizationById(id)</span>
+<span class="fc" id="L49">                .map(organization -&gt; {</span>
+<span class="fc" id="L50">                    model.addAttribute(&quot;organization&quot;, organization);</span>
+<span class="fc" id="L51">                    return &quot;organizations/view&quot;;</span>
+                })
+<span class="fc" id="L53">                .orElse(&quot;redirect:/organizations&quot;);</span>
+    }
+
+    @GetMapping(&quot;/new&quot;)
+    public String newOrganizationForm(Model model) {
+<span class="nc" id="L58">        model.addAttribute(&quot;organization&quot;, new Organization());</span>
+<span class="nc" id="L59">        model.addAttribute(&quot;organizationTypes&quot;, organizationTypeRepository.findAll());</span>
+<span class="nc" id="L60">        return &quot;organizations/form&quot;;</span>
+    }
+
+    @PostMapping
+    public String createOrganization(@ModelAttribute Organization organization) {
+        try {
+<span class="fc" id="L66">            organizationService.createOrganization(organization);</span>
+<span class="fc" id="L67">            return &quot;redirect:/organizations&quot;;</span>
+<span class="nc" id="L68">        } catch (RuntimeException e) {</span>
+<span class="nc" id="L69">            return &quot;redirect:/organizations/new?error=save_failed&quot;;</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}/edit&quot;)
+    public String editOrganizationForm(@PathVariable UUID id, Model model) {
+<span class="fc" id="L75">        return organizationService.getOrganizationById(id)</span>
+<span class="fc" id="L76">                .map(organization -&gt; {</span>
+<span class="fc" id="L77">                    model.addAttribute(&quot;organization&quot;, organization);</span>
+<span class="fc" id="L78">                    model.addAttribute(&quot;organizationTypes&quot;, organizationTypeRepository.findAll());</span>
+<span class="fc" id="L79">                    model.addAttribute(&quot;orgId&quot;, id);</span>
+<span class="fc" id="L80">                    return &quot;organizations/form&quot;;</span>
+                })
+<span class="fc" id="L82">                .orElse(&quot;redirect:/organizations&quot;);</span>
+    }
+
+    @PostMapping(&quot;/{id}&quot;)
+    public String updateOrganization(@PathVariable UUID id, @ModelAttribute Organization organization) {
+        try {
+<span class="fc" id="L88">            organizationService.updateOrganization(id, organization);</span>
+<span class="fc" id="L89">            return &quot;redirect:/organizations&quot;;</span>
+<span class="nc" id="L90">        } catch (RuntimeException e) {</span>
+<span class="nc" id="L91">            return &quot;redirect:/organizations/&quot; + id + &quot;/edit?error=save_failed&quot;;</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/delete&quot;)
+    public String deleteOrganization(@PathVariable UUID id) {
+<span class="fc" id="L97">        organizationService.deleteOrganization(id);</span>
+<span class="fc" id="L98">        return &quot;redirect:/organizations&quot;;</span>
+    }
+
+    @GetMapping(&quot;/search&quot;)
+    public String searchOrganizations(@RequestParam String query, Model model) {
+<span class="fc" id="L103">        return &quot;redirect:/organizations?query=&quot; + query;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

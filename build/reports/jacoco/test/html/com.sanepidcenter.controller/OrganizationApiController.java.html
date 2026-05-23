@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrganizationApiController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.controller</a> &gt; <span class="el_source">OrganizationApiController.java</span></div><h1>OrganizationApiController.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.controller;
+
+import com.sanepidcenter.dto.OrganizationDto;
+import com.sanepidcenter.dto.OrganizationTypeDto;
+import com.sanepidcenter.model.Organization;
+import com.sanepidcenter.model.OrganizationType;
+import com.sanepidcenter.service.OrganizationService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping(&quot;/api/organizations&quot;)
+<span class="fc" id="L20">@RequiredArgsConstructor</span>
+@CrossOrigin(origins = &quot;*&quot;)
+public class OrganizationApiController {
+
+    private final OrganizationService organizationService;
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;OrganizationDto&gt;&gt; getAllOrganizations() {
+<span class="fc" id="L28">        List&lt;OrganizationDto&gt; organizations = organizationService.getAllOrganizations()</span>
+<span class="fc" id="L29">                .stream()</span>
+<span class="fc" id="L30">                .map(this::convertToDto)</span>
+<span class="fc" id="L31">                .collect(Collectors.toList());</span>
+<span class="fc" id="L32">        return ResponseEntity.ok(organizations);</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;OrganizationDto&gt; getOrganizationById(@PathVariable UUID id) {
+<span class="fc" id="L37">        return organizationService.getOrganizationById(id)</span>
+<span class="fc" id="L38">                .map(org -&gt; ResponseEntity.ok(convertToDto(org)))</span>
+<span class="fc" id="L39">                .orElse(ResponseEntity.notFound().build());</span>
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;?&gt; createOrganization(@Valid @RequestBody OrganizationDto organizationDto) {
+        try {
+<span class="fc" id="L45">            Organization organization = convertToEntity(organizationDto);</span>
+<span class="fc" id="L46">            Organization created = organizationService.createOrganization(organization);</span>
+<span class="fc" id="L47">            return ResponseEntity.ok(convertToDto(created));</span>
+<span class="fc" id="L48">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L49">            return ResponseEntity.badRequest().body(Map.of(&quot;error&quot;, e.getMessage()));</span>
+        }
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;?&gt; updateOrganization(
+            @PathVariable UUID id,
+            @Valid @RequestBody OrganizationDto organizationDto) {
+        try {
+<span class="fc" id="L58">            Organization organization = convertToEntity(organizationDto);</span>
+<span class="fc" id="L59">            Organization updated = organizationService.updateOrganization(id, organization);</span>
+<span class="fc" id="L60">            return ResponseEntity.ok(convertToDto(updated));</span>
+<span class="fc" id="L61">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L62">            return ResponseEntity.badRequest().body(Map.of(&quot;error&quot;, e.getMessage()));</span>
+        }
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteOrganization(@PathVariable UUID id) {
+<span class="fc" id="L68">        organizationService.deleteOrganization(id);</span>
+<span class="fc" id="L69">        return ResponseEntity.ok().build();</span>
+    }
+
+    @GetMapping(&quot;/search&quot;)
+    public ResponseEntity&lt;List&lt;OrganizationDto&gt;&gt; searchOrganizations(@RequestParam String query) {
+<span class="fc" id="L74">        List&lt;OrganizationDto&gt; organizations = organizationService.searchAllFields(query)</span>
+<span class="fc" id="L75">                .stream()</span>
+<span class="fc" id="L76">                .map(this::convertToDto)</span>
+<span class="fc" id="L77">                .collect(Collectors.toList());</span>
+<span class="fc" id="L78">        return ResponseEntity.ok(organizations);</span>
+    }
+
+    private OrganizationDto convertToDto(Organization organization) {
+<span class="fc" id="L82">        OrganizationDto dto = new OrganizationDto();</span>
+<span class="fc" id="L83">        dto.setId(organization.getId());</span>
+<span class="fc" id="L84">        dto.setName(organization.getName());</span>
+<span class="fc" id="L85">        dto.setShortName(organization.getShortName());</span>
+<span class="fc" id="L86">        dto.setRegistrationNumber(organization.getRegistrationNumber());</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (organization.getType() != null) {</span>
+<span class="fc" id="L88">            OrganizationTypeDto typeDto = new OrganizationTypeDto();</span>
+<span class="fc" id="L89">            typeDto.setId(organization.getType().getId());</span>
+<span class="fc" id="L90">            typeDto.setName(organization.getType().getName());</span>
+<span class="fc" id="L91">            typeDto.setDescription(organization.getType().getDescription());</span>
+<span class="fc" id="L92">            dto.setType(typeDto);</span>
+        }
+<span class="fc" id="L94">        dto.setAddress(organization.getAddress());</span>
+<span class="fc" id="L95">        dto.setCity(organization.getCity());</span>
+<span class="fc" id="L96">        dto.setDirectorName(organization.getDirectorName());</span>
+<span class="fc" id="L97">        dto.setPhone(organization.getPhone());</span>
+<span class="fc" id="L98">        dto.setEmail(organization.getEmail());</span>
+<span class="fc" id="L99">        dto.setEmployeeCount(organization.getEmployeeCount());</span>
+<span class="fc" id="L100">        dto.setRiskCategory(organization.getRiskCategory());</span>
+<span class="fc" id="L101">        dto.setNotes(organization.getNotes());</span>
+<span class="fc" id="L102">        return dto;</span>
+    }
+
+    private Organization convertToEntity(OrganizationDto dto) {
+<span class="fc" id="L106">        Organization organization = new Organization();</span>
+<span class="fc" id="L107">        organization.setId(dto.getId());</span>
+<span class="fc" id="L108">        organization.setName(dto.getName());</span>
+<span class="fc" id="L109">        organization.setShortName(dto.getShortName());</span>
+<span class="fc" id="L110">        organization.setRegistrationNumber(dto.getRegistrationNumber());</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        if (dto.getType() != null) {</span>
+<span class="fc" id="L112">            OrganizationType type = new OrganizationType();</span>
+<span class="fc" id="L113">            type.setId(dto.getType().getId());</span>
+<span class="fc" id="L114">            organization.setType(type);</span>
+        }
+<span class="fc" id="L116">        organization.setAddress(dto.getAddress());</span>
+<span class="fc" id="L117">        organization.setCity(dto.getCity());</span>
+<span class="fc" id="L118">        organization.setDirectorName(dto.getDirectorName());</span>
+<span class="fc" id="L119">        organization.setPhone(dto.getPhone());</span>
+<span class="fc" id="L120">        organization.setEmail(dto.getEmail());</span>
+<span class="fc" id="L121">        organization.setEmployeeCount(dto.getEmployeeCount());</span>
+<span class="fc" id="L122">        organization.setRiskCategory(dto.getRiskCategory());</span>
+<span class="fc" id="L123">        organization.setNotes(dto.getNotes());</span>
+<span class="fc" id="L124">        return organization;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

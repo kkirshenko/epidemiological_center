@@ -112,4 +112,25 @@ class OrganizationServiceTest {
 
         verify(organizationRepository).deleteById(id);
     }
+
+    @Test
+    void sortOrganizations_ByNameDescending_ShouldSort() {
+        Organization second = Organization.builder().id(UUID.randomUUID()).name("Beta").shortName("B").city("Kazan").riskCategory("high").build();
+        Organization first = Organization.builder().id(UUID.randomUUID()).name("Alpha").shortName("A").city("Moscow").riskCategory("low").build();
+
+        List<Organization> result = organizationService.sortOrganizations(List.of(first, second), "name", "desc");
+
+        assertEquals("Beta", result.get(0).getName());
+    }
+
+    @Test
+    void updateOrganization_WhenNotFound_ShouldThrow() {
+        UUID id = UUID.randomUUID();
+        when(organizationRepository.findById(id)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> organizationService.updateOrganization(id, testOrganization));
+
+        assertTrue(exception.getMessage().contains("Organization not found"));
+    }
 }

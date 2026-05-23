@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ViolationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.service</a> &gt; <span class="el_source">ViolationService.java</span></div><h1>ViolationService.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.service;
+
+import com.sanepidcenter.model.Inspection;
+import com.sanepidcenter.model.Violation;
+import com.sanepidcenter.repository.InspectionRepository;
+import com.sanepidcenter.repository.ViolationRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+<span class="fc" id="L16">@RequiredArgsConstructor</span>
+@Transactional(readOnly = true)
+public class ViolationService {
+
+    private final ViolationRepository violationRepository;
+    private final InspectionRepository inspectionRepository;
+
+    public List&lt;Violation&gt; getAllViolations() {
+<span class="nc" id="L24">        return violationRepository.findAllWithDetails();</span>
+    }
+
+    public List&lt;Violation&gt; searchAllFields(String query) {
+<span class="nc" id="L28">        return violationRepository.findAllFieldsContainingIgnoreCase(query);</span>
+    }
+
+    public List&lt;Violation&gt; sortViolations(List&lt;Violation&gt; violations, String sortBy, String sortDir) {
+<span class="pc bpc" id="L32" title="2 of 4 branches missed.">        if (sortBy == null || sortBy.isEmpty()) {</span>
+<span class="nc" id="L33">            return violations;</span>
+        }
+        
+<span class="pc bpc" id="L36" title="1 of 4 branches missed.">        boolean ascending = sortDir == null || &quot;asc&quot;.equalsIgnoreCase(sortDir);</span>
+        
+<span class="fc" id="L38">        return violations.stream()</span>
+<span class="fc" id="L39">            .sorted((v1, v2) -&gt; {</span>
+<span class="fc" id="L40">                int cmp = 0;</span>
+<span class="pc bpc" id="L41" title="3 of 5 branches missed.">                switch (sortBy.toLowerCase()) {</span>
+                    case &quot;inspection&quot;:
+<span class="pc bpc" id="L43" title="2 of 4 branches missed.">                        String insp1 = v1.getInspection() != null &amp;&amp; v1.getInspection().getOrganization() != null </span>
+<span class="pc" id="L44">                            ? v1.getInspection().getOrganization().getName() : &quot;&quot;;</span>
+<span class="pc bpc" id="L45" title="2 of 4 branches missed.">                        String insp2 = v2.getInspection() != null &amp;&amp; v2.getInspection().getOrganization() != null </span>
+<span class="pc" id="L46">                            ? v2.getInspection().getOrganization().getName() : &quot;&quot;;</span>
+<span class="fc" id="L47">                        cmp = insp1.compareToIgnoreCase(insp2);</span>
+<span class="fc" id="L48">                        break;</span>
+                    case &quot;description&quot;:
+<span class="nc" id="L50">                        cmp = v1.getDescription().compareToIgnoreCase(v2.getDescription());</span>
+<span class="nc" id="L51">                        break;</span>
+                    case &quot;severity&quot;:
+<span class="nc" id="L53">                        cmp = v1.getSeverity().compareToIgnoreCase(v2.getSeverity());</span>
+<span class="nc" id="L54">                        break;</span>
+                    case &quot;status&quot;:
+<span class="fc" id="L56">                        Boolean r1 = v1.getResolved();</span>
+<span class="fc" id="L57">                        Boolean r2 = v2.getResolved();</span>
+<span class="pc bpc" id="L58" title="2 of 4 branches missed.">                        cmp = (r1 ? &quot;Устранено&quot; : &quot;Не устранено&quot;).compareToIgnoreCase(r2 ? &quot;Устранено&quot; : &quot;Не устранено&quot;);</span>
+<span class="fc" id="L59">                        break;</span>
+                    default:
+<span class="nc" id="L61">                        cmp = 0;</span>
+                }
+<span class="fc bfc" id="L63" title="All 2 branches covered.">                return ascending ? cmp : -cmp;</span>
+            })
+<span class="fc" id="L65">            .toList();</span>
+    }
+
+    @Transactional
+    public Violation createViolation(Violation violation) {
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        UUID inspectionId = violation.getInspection() != null ? violation.getInspection().getId() : null;</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        if (inspectionId == null) {</span>
+<span class="nc" id="L72">            throw new IllegalArgumentException(&quot;Inspection is required&quot;);</span>
+        }
+
+<span class="fc" id="L75">        Inspection inspection = inspectionRepository.findById(inspectionId)</span>
+<span class="fc" id="L76">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Inspection not found: &quot; + inspectionId));</span>
+<span class="fc" id="L77">        violation.setInspection(inspection);</span>
+
+<span class="fc" id="L79">        return violationRepository.save(violation);</span>
+    }
+
+    @Transactional
+    public Violation updateViolation(UUID id, Violation violationDetails) {
+<span class="fc" id="L84">        Violation violation = violationRepository.findById(id)</span>
+<span class="pc" id="L85">                .orElseThrow(() -&gt; new RuntimeException(&quot;Violation not found: &quot; + id));</span>
+
+<span class="pc bpc" id="L87" title="3 of 4 branches missed.">        if (violationDetails.getInspection() != null &amp;&amp; violationDetails.getInspection().getId() != null) {</span>
+<span class="nc" id="L88">            Inspection inspection = inspectionRepository.findById(violationDetails.getInspection().getId())</span>
+<span class="nc" id="L89">                    .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Inspection not found: &quot; + violationDetails.getInspection().getId()));</span>
+<span class="nc" id="L90">            violation.setInspection(inspection);</span>
+        }
+
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (violationDetails.getDescription() != null) {</span>
+<span class="nc" id="L94">            violation.setDescription(violationDetails.getDescription());</span>
+        }
+
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if (violationDetails.getSeverity() != null) {</span>
+<span class="fc" id="L98">            violation.setSeverity(violationDetails.getSeverity());</span>
+        }
+
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if (violationDetails.getResolved() != null) {</span>
+<span class="fc" id="L102">            boolean newResolved = violationDetails.getResolved();</span>
+<span class="pc bpc" id="L103" title="3 of 6 branches missed.">            if (newResolved &amp;&amp; (violation.getResolved() == null || !violation.getResolved())) {</span>
+<span class="fc" id="L104">                violation.setCorrectionDeadline(LocalDate.now());</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">            } else if (!newResolved) {</span>
+<span class="nc" id="L106">                violation.setCorrectionDeadline(null);</span>
+            }
+<span class="fc" id="L108">            violation.setResolved(newResolved);</span>
+        }
+
+<span class="fc" id="L111">        return violationRepository.save(violation);</span>
+    }
+
+    @Transactional
+    public void deleteViolation(UUID id) {
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">        if (!violationRepository.existsById(id)) {</span>
+<span class="fc" id="L117">            throw new RuntimeException(&quot;Violation not found: &quot; + id);</span>
+        }
+<span class="nc" id="L119">        violationRepository.deleteById(id);</span>
+<span class="nc" id="L120">    }</span>
+
+    public java.util.Optional&lt;Violation&gt; getViolationById(UUID id) {
+<span class="nc" id="L123">        return violationRepository.findByIdWithDetails(id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

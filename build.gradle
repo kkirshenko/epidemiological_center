@@ -1,9 +1,10 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.4'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'war'
     id 'jacoco'
+    id 'org.sonarqube' version '5.1.0.4882'
 }
 
 group = 'com.sanepidcenter'
@@ -50,6 +51,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     
     // Development tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -74,6 +76,28 @@ jacocoTestReport {
     }
 }
 
+
+jacoco {
+    toolVersion = '0.8.12'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'CLASS'
+            includes = [
+                    'com.sanepidcenter.service.*',
+                    'com.sanepidcenter.security.JwtTokenUtil'
+            ]
+            limit {
+                counter = 'INSTRUCTION'
+                value = 'COVEREDRATIO'
+                minimum = 0.40
+            }
+        }
+    }
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
@@ -81,4 +105,19 @@ tasks.withType(JavaCompile) {
 bootWar {
     archiveBaseName = 'sanepidcenter'
     archiveVersion = '1.0.0'
+}
+
+
+tasks.named('check') {
+    dependsOn tasks.named('jacocoTestCoverageVerification')
+}
+
+
+sonarqube {
+    properties {
+        property 'sonar.projectKey', 'sanepidcenter'
+        property 'sonar.projectName', 'sanepidcenter'
+        property 'sonar.coverage.jacoco.xmlReportPaths',
+                "${layout.buildDirectory.get().asFile}/reports/jacoco/test/jacocoTestReport.xml"
+    }
 }

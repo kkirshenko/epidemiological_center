@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.controller.InspectionApiControllerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:23.495Z" hostname="VITALPC" time="0.047">
+  <properties/>
+  <testcase name="apiCrud_ShouldCoverOkBadRequestNotFound()" classname="com.sanepidcenter.controller.InspectionApiControllerTest" time="0.046"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

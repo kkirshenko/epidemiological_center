@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.security.JwtAuthenticationFilterTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:23.807Z" hostname="VITALPC" time="0.066">
+  <properties/>
+  <testcase name="shouldAuthenticate_WhenAuthorizationHeaderContainsRawTokenWithoutBearer()" classname="com.sanepidcenter.security.JwtAuthenticationFilterTest" time="0.06"/>
+  <testcase name="shouldAuthenticate_WhenTokenComesFromXAuthTokenHeader()" classname="com.sanepidcenter.security.JwtAuthenticationFilterTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.service.InspectionServiceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:24.535Z" hostname="VITALPC" time="0.037">
+  <properties/>
+  <testcase name="sortInspections_ByOrganizationAscending_ShouldSort()" classname="com.sanepidcenter.service.InspectionServiceTest" time="0.004"/>
+  <testcase name="createInspection_ShouldAttachReferencesAndSave()" classname="com.sanepidcenter.service.InspectionServiceTest" time="0.006"/>
+  <testcase name="updateInspection_WhenMissing_ShouldThrow()" classname="com.sanepidcenter.service.InspectionServiceTest" time="0.005"/>
+  <testcase name="getInspectionById_WhenExists_ShouldReturnInspection()" classname="com.sanepidcenter.service.InspectionServiceTest" time="0.002"/>
+  <testcase name="getPlannedInspections_ShouldReturnOnlyPlanned()" classname="com.sanepidcenter.service.InspectionServiceTest" time="0.004"/>
+  <testcase name="getAllInspections_ShouldReturnList()" classname="com.sanepidcenter.service.InspectionServiceTest" time="0.002"/>
+  <testcase name="createInspection_Completed_ShouldSetEndDate()" classname="com.sanepidcenter.service.InspectionServiceTest" time="0.003"/>
+  <testcase name="createInspection_WithoutScheduledDate_ShouldThrow()" classname="com.sanepidcenter.service.InspectionServiceTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
 import javax.crypto.SecretKey;
 import java.util.Collections;
 import java.util.Date;
@@ -43,13 +42,13 @@ public class JwtTokenUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith((SecretKey) getSigningKey())
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
     }
 
-    private Key getSigningKey() {
+    private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -70,11 +69,11 @@ public class JwtTokenUtil {
     private String createToken(Map<String, Object> claims, String subject) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(now))
-                .setExpiration(new Date(now + expiration))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .claims(claims)
+                .subject(subject)
+                .issuedAt(new Date(now))
+                .expiration(new Date(now + expiration))
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -86,20 +85,12 @@ public class JwtTokenUtil {
     public Boolean validateToken(String token) {
         try {
             Jwts.parser()
-                .verifyWith((SecretKey) getSigningKey())
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token);
             return true;
-        } catch (SignatureException e) {
-            // Invalid signature
-        } catch (MalformedJwtException e) {
-            // Invalid token format
-        } catch (ExpiredJwtException e) {
-            // Token is expired
-        } catch (UnsupportedJwtException e) {
-            // Unsupported token
-        } catch (IllegalArgumentException e) {
-            // Empty token
+        } catch (JwtException | IllegalArgumentException e) {
+            // Invalid, expired, unsupported or empty token
         }
         return false;
     }
@@ -112,7 +103,6 @@ public class JwtTokenUtil {
         return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
-    @SuppressWarnings("unchecked")
     public List<String> extractRoles(String token) {
         return extractClaim(token, claims -> {
             Object roles = claims.get("roles");

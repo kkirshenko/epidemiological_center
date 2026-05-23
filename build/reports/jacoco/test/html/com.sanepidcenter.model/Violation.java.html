@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Violation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.model</a> &gt; <span class="el_source">Violation.java</span></div><h1>Violation.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.model;
+
+import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+/**
+ * Entity representing a violation found during an inspection.
+ */
+@Entity
+@Table(name = &quot;violations&quot;)
+<span class="pc bnc" id="L20" title="All 94 branches missed.">@Data</span>
+<span class="fc" id="L21">@NoArgsConstructor</span>
+<span class="fc" id="L22">@AllArgsConstructor</span>
+<span class="pc bfc" id="L23" title="All 4 branches covered.">@Builder</span>
+public class Violation {
+
+    @Id
+    @Column(columnDefinition = &quot;uuid&quot;)
+<span class="fc" id="L28">    private UUID id;</span>
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;inspection_id&quot;, nullable = false)
+    @JsonIgnoreProperties({&quot;violations&quot;, &quot;organization&quot;, &quot;type&quot;, &quot;inspector&quot;, &quot;createdAt&quot;, &quot;updatedAt&quot;})
+<span class="fc" id="L33">    private Inspection inspection;</span>
+
+    @Column(name = &quot;code&quot;, nullable = false)
+<span class="fc" id="L36">    private String code;</span>
+
+    @Column(name = &quot;description&quot;, nullable = false, columnDefinition = &quot;text&quot;)
+<span class="fc" id="L39">    private String description;</span>
+
+    @Column(name = &quot;severity&quot;, nullable = false, length = 20)
+    @Builder.Default
+<span class="fc" id="L43">    private String severity = &quot;minor&quot;;</span>
+
+    @Column(name = &quot;article_reference&quot;, nullable = false)
+<span class="fc" id="L46">    private String articleReference;</span>
+
+    @Column(name = &quot;correction_deadline&quot;)
+<span class="fc" id="L49">    private LocalDate correctionDeadline;</span>
+
+    @Column(name = &quot;resolved&quot;, nullable = false)
+    @Builder.Default
+<span class="fc" id="L53">    private Boolean resolved = false;</span>
+
+    @Column(name = &quot;resolution_notes&quot;, nullable = false, columnDefinition = &quot;text&quot;)
+<span class="fc" id="L56">    private String resolutionNotes;</span>
+
+    @CreationTimestamp
+    @Column(name = &quot;created_at&quot;, updatable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+<span class="fc" id="L62">    private LocalDateTime createdAt;</span>
+
+    @UpdateTimestamp
+    @Column(name = &quot;updated_at&quot;)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+<span class="fc" id="L68">    private LocalDateTime updatedAt;</span>
+
+    @PrePersist
+    private void ensureId() {
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (id == null) {</span>
+<span class="fc" id="L73">            id = UUID.randomUUID();</span>
+        }
+<span class="fc" id="L75">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

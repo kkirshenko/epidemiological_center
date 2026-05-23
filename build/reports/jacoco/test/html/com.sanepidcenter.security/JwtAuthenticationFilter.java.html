@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtAuthenticationFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.security</a> &gt; <span class="el_source">JwtAuthenticationFilter.java</span></div><h1>JwtAuthenticationFilter.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.security;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * JWT Authentication Filter for processing JWT tokens in requests.
+ */
+@Component
+<span class="fc" id="L26">@RequiredArgsConstructor</span>
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtTokenUtil jwtTokenUtil;
+    private final CustomUserDetailsService userDetailsService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
+                                    FilterChain filterChain) throws ServletException, IOException {
+        try {
+<span class="fc" id="L36">            String jwt = getJwtFromRequest(request);</span>
+
+<span class="pc bpc" id="L38" title="2 of 4 branches missed.">            if (StringUtils.hasText(jwt) &amp;&amp; jwtTokenUtil.validateToken(jwt)) {</span>
+<span class="fc" id="L39">                String username = jwtTokenUtil.extractUsername(jwt);</span>
+<span class="fc" id="L40">                UserDetails userDetails = userDetailsService.loadUserByUsername(username);</span>
+
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">                if (!jwtTokenUtil.validateToken(jwt, userDetails)) {</span>
+<span class="nc" id="L43">                    filterChain.doFilter(request, response);</span>
+<span class="nc" id="L44">                    return;</span>
+                }
+
+<span class="fc" id="L47">                Collection&lt;? extends GrantedAuthority&gt; authorities = resolveAuthorities(jwt, userDetails);</span>
+<span class="fc" id="L48">                UsernamePasswordAuthenticationToken authentication = </span>
+                    new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+<span class="fc" id="L50">                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));</span>
+                
+<span class="fc" id="L52">                SecurityContextHolder.getContext().setAuthentication(authentication);</span>
+            }
+<span class="nc" id="L54">        } catch (Exception ex) {</span>
+<span class="nc" id="L55">            logger.error(&quot;Could not set user authentication in security context&quot;, ex);</span>
+<span class="fc" id="L56">        }</span>
+
+<span class="fc" id="L58">        filterChain.doFilter(request, response);</span>
+<span class="fc" id="L59">    }</span>
+
+    private String getJwtFromRequest(HttpServletRequest request) {
+<span class="fc" id="L62">        String bearerToken = request.getHeader(&quot;Authorization&quot;);</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (StringUtils.hasText(bearerToken)) {</span>
+<span class="fc" id="L64">            String trimmed = bearerToken.trim();</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">            if (trimmed.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="nc" id="L66">                return trimmed.substring(7).trim();</span>
+            }
+<span class="fc" id="L68">            return trimmed;</span>
+        }
+
+<span class="fc" id="L71">        String tokenFromCustomHeader = request.getHeader(&quot;X-Auth-Token&quot;);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (StringUtils.hasText(tokenFromCustomHeader)) {</span>
+<span class="fc" id="L73">            return tokenFromCustomHeader.trim();</span>
+        }
+<span class="nc" id="L75">        return null;</span>
+    }
+
+    private Collection&lt;? extends GrantedAuthority&gt; resolveAuthorities(String jwt, UserDetails userDetails) {
+<span class="fc" id="L79">        List&lt;String&gt; tokenRoles = jwtTokenUtil.extractRoles(jwt);</span>
+<span class="pc bpc" id="L80" title="2 of 4 branches missed.">        if (tokenRoles == null || tokenRoles.isEmpty()) {</span>
+<span class="nc" id="L81">            return userDetails.getAuthorities();</span>
+        }
+
+<span class="fc" id="L84">        return tokenRoles.stream()</span>
+<span class="fc" id="L85">                .map(jwtTokenUtil::normalizeRole)</span>
+<span class="fc" id="L86">                .map(SimpleGrantedAuthority::new)</span>
+<span class="fc" id="L87">                .toList();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomUserDetailsService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sanepidcenter</a> &gt; <a href="index.source.html" class="el_package">com.sanepidcenter.security</a> &gt; <span class="el_source">CustomUserDetailsService.java</span></div><h1>CustomUserDetailsService.java</h1><pre class="source lang-java linenums">package com.sanepidcenter.security;
+
+import com.sanepidcenter.model.Profile;
+import com.sanepidcenter.repository.ProfileRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+
+/**
+ * Custom UserDetailsService for loading user details from the database.
+ */
+@Service
+<span class="fc" id="L19">@RequiredArgsConstructor</span>
+public class CustomUserDetailsService implements UserDetailsService {
+
+    private final ProfileRepository profileRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+<span class="fc" id="L26">        Profile profile = profileRepository.findByUsername(username)</span>
+<span class="fc" id="L27">                .orElseThrow(() -&gt; new UsernameNotFoundException(&quot;User not found with username: &quot; + username));</span>
+
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (!profile.getIsActive()) {</span>
+<span class="fc" id="L30">            throw new UsernameNotFoundException(&quot;User account is deactivated: &quot; + username);</span>
+        }
+
+<span class="fc" id="L33">        String role = profile.getRole();</span>
+<span class="pc bpc" id="L34" title="2 of 4 branches missed.">        if (role != null &amp;&amp; !role.startsWith(&quot;ROLE_&quot;)) {</span>
+<span class="fc" id="L35">            role = &quot;ROLE_&quot; + role;</span>
+        }
+
+<span class="fc" id="L38">        return new User(</span>
+<span class="fc" id="L39">                profile.getUsername(),</span>
+<span class="fc" id="L40">                profile.getPassword(),</span>
+<span class="fc" id="L41">                Collections.singletonList(new SimpleGrantedAuthority(role))</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

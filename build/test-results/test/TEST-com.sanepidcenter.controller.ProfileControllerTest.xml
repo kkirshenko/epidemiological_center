@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sanepidcenter.controller.ProfileControllerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-05-23T19:06:23.646Z" hostname="VITALPC" time="0.012">
+  <properties/>
+  <testcase name="editUserForm_WhenMissing_ShouldRedirect()" classname="com.sanepidcenter.controller.ProfileControllerTest" time="0.002"/>
+  <testcase name="listUsers_ShouldPopulateModelAndReturnView()" classname="com.sanepidcenter.controller.ProfileControllerTest" time="0.002"/>
+  <testcase name="updateDeleteToggle_ShouldCallServiceAndSetFlash()" classname="com.sanepidcenter.controller.ProfileControllerTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

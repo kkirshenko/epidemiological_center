@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр организации</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableArea, #printableArea * {
+                visibility: visible;
+            }
+            #printableArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        .detail-row {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #333;
+            min-width: 200px;
+            display: inline-block;
+        }
+        .action-buttons {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .action-buttons .btn {
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<main class="container">
+    <div class="no-print" style="margin-bottom: 1rem;">
+        <a th:href="@{/organizations}" class="btn">Назад</a>
+    </div>
+    
+    <div id="printableArea">
+        <h2 th:text="${organization.name}">Организация</h2>
+        
+        <div class="detail-row">
+            <span class="detail-label">Краткое название:</span>
+            <span th:text="${organization.shortName}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Регистрационный номер:</span>
+            <span th:text="${organization.registrationNumber != null ? organization.registrationNumber : '-'}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Тип:</span>
+            <span th:text="${organization.type != null ? organization.type.name : '-'}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Город:</span>
+            <span th:text="${organization.city}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Адрес:</span>
+            <span th:text="${organization.address}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Руководитель:</span>
+            <span th:text="${organization.directorName}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Телефон:</span>
+            <span th:text="${organization.phone}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Email:</span>
+            <span th:text="${organization.email}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Количество сотрудников:</span>
+            <span th:text="${organization.employeeCount}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Категория риска:</span>
+            <span th:text="${organization.riskCategory == 'low' ? 'Низкий' : (organization.riskCategory == 'medium' ? 'Средний' : (organization.riskCategory == 'high' ? 'Высокий' : (organization.riskCategory == 'critical' ? 'Критический' : organization.riskCategory)))}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Статус:</span>
+            <span th:text="${organization.isActive ? 'Активна' : 'Не активна'}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Примечания:</span>
+            <span th:text="${organization.notes != null && !organization.notes.isEmpty() ? organization.notes : '-'}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Дата создания:</span>
+            <span th:text="${organization.createdAt != null ? #temporals.format(organization.createdAt, 'dd.MM.yyyy') : '-'}"></span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">Дата обновления:</span>
+            <span th:text="${organization.updatedAt != null ? #temporals.format(organization.updatedAt, 'dd.MM.yyyy') : '-'}"></span>
+        </div>
+    </div>
+    
+    <div class="action-buttons no-print">
+        <button onclick="window.print()" class="btn">🖨️ Печать</button>
+        <button onclick="sendByEmail()" class="btn">📧 Отправить по почте</button>
+        <a th:href="@{/organizations/{id}/edit(id=${organization.id})}" class="btn manage-organizations">Редактировать</a>
+        <form th:action="@{/organizations/{id}/delete(id=${organization.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger manage-organizations" onclick="return confirm('Вы уверены?');">Удалить</button>
+        </form>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 СанЭпидЦентр. Все права защищены.</p>
+        <p>Связаться с нами:
+            <a href="https://github.com/kkirshenko" target="_blank" rel="noopener" class="social-icon" title="GitHub"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+            <a href="https://vk.com/k.kirshenko" target="_blank" rel="noopener" class="social-icon" title="ВКонтакте"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15.073 2H8.937C5.009 2 2 5.009 2 8.937v6.126C2 18.991 5.009 22 8.937 22h6.136C18.991 22 22 18.991 22 15.063V8.937C22 5.009 18.991 2 15.073 2zM17.89 14.95c.465.465.93.93 1.455.93h.525v1.575h-1.05c-.525 0-1.05-.262-1.575-.787l-.525-.525c-.465-.465-.93-.93-1.455-.93h-.525v.525c0 .525-.262 1.05-.787 1.575l-.525.525c-.465.465-.93.93-1.455.93h-.525v-1.05c0-.525.262-1.05.787-1.575l.525-.525c.465-.465.93-.93.93-1.455v-.525h-.525c-.525 0-1.05-.262-1.575-.787l-.525-.525c-.465-.465-.93-.93-.93-1.455v-.525h1.05c.525 0 1.05.262 1.575.787l.525.525c.465.465.93.93 1.455.93h.525v-.525c0-.525.262-1.05.787-1.575l.525-.525c.465-.465.93-.93 1.455-.93h.525v1.05c0 .525-.262 1.05-.787 1.575l-.525.525c-.465.465.93.93-.93 1.455v.525h.525c.525 0 1.05.262 1.575.787l.525.525z"/></svg></a>
+        </p>
+    </div>
+</footer>
+
+<script th:src="@{/js/auth.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () { 
+        // Страница просмотра доступна всем без аутентификации
+    });
+    
+    function sendByEmail() {
+        const subject = encodeURIComponent('Информация об организации: ' + '[[${organization.name}]]');
+        const body = encodeURIComponent(
+            'Организация: [[${organization.name}]]\n' +
+            'Краткое название: [[${organization.shortName}]]\n' +
+            'Регистрационный номер: [[${organization.registrationNumber != null ? organization.registrationNumber : '-'}]]\n' +
+            'Тип: [[${organization.type != null ? organization.type.name : '-'}]]\n' +
+            'Город: [[${organization.city}]]\n' +
+            'Адрес: [[${organization.address}]]\n' +
+            'Руководитель: [[${organization.directorName}]]\n' +
+            'Телефон: [[${organization.phone}]]\n' +
+            'Email: [[${organization.email}]]\n' +
+            'Количество сотрудников: [[${organization.employeeCount}]]\n' +
+            'Категория риска: [[${organization.riskCategory}]]\n' +
+            'Статус: [[${organization.isActive ? 'Активна' : 'Не активна'}]]\n' +
+            'Примечания: [[${organization.notes != null && !organization.notes.isEmpty() ? organization.notes : '-'}]]'
+        );
+        window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+    }
+</script>
+</body>
+</html>
