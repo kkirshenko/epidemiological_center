@@ -23,13 +23,14 @@
 
 ### 2.1. Стратегия тестирования
 
-Уровень │ Инструменты │ Объект тестирования
-─────────────────┼──────────────────────────┼─────────────────────
-Unit │ JUnit 5, Mockito │ Сервисы, утилиты
-Integration │ @SpringBootTest, Testcontainers │ Контроллеры + сервисы + репозитории
-API │ MockMvc, RestAssured │ REST-эндпоинты
-Security │ Spring Security Test │ JWT, роли, валидация
+# Уровни тестирования системы
 
+| Уровень | Инструменты | Объект тестирования |
+|---------|-------------|---------------------|
+| **Unit** | JUnit 5, Mockito | Сервисы, утилиты |
+| **Integration** | @SpringBootTest, Testcontainers | Контроллеры + сервисы + репозитории |
+| **API** | MockMvc, RestAssured | REST-эндпоинты |
+| **Security** | Spring Security Test | JWT, роли, валидация |
 
 ---
 
