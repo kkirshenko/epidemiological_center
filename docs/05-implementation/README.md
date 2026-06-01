@@ -10,61 +10,71 @@
 
 ## 1. Общая схема слоёв
 
-┌─────────────────────────────────────────┐
-│ Presentation (P) │
-│ Thymeleaf Templates + HTML/CSS/JS │
-│ • main.html, inspection-form.html │
-│ • Валидация форм, условный рендеринг │
-└────────────────┬────────────────────────┘
-│ пользовательские события
-▼
-┌─────────────────────────────────────────┐
-│ Control (C) │
-│ @Controller / @RestController │
-│ • OrganizationController │
-│ • InspectionController │
-│ • ViolationController │
-│ • ProfileController │
-└────────────────┬────────────────────────┘
-│ делегирование бизнес-логики
-▼
-┌─────────────────────────────────────────┐
-│ Mediator (M) │
-│ @Service (бизнес-логика) │
-│ • OrganizationService │
-│ • InspectionService │
-│ • ViolationService │
-│ • ProfileService │
-└────────────────┬────────────────────────┘
-│ манипуляция сущностями
-▼
-┌─────────────────────────────────────────┐
-│ Entity (E) │
-│ @Entity JPA-классы (доменная модель) │
-│ • Organization │
-│ • Inspection │
-│ • Violation │
-│ • Profile │
-└────────────────┬────────────────────────┘
-│ доступ к данным
-▼
-┌─────────────────────────────────────────┐
-│ Foundation (F) │
-│ JpaRepository + утилиты │
-│ • OrganizationRepository │
-│ • InspectionRepository │
-│ • ViolationRepository │
-│ • ProfileRepository │
-└────────────────┬────────────────────────┘
-│ JDBC
-▼
-┌─────────────────────────────────────────┐
-│ PostgreSQL 15 │
-│ • Схема: sanepidcenter │
-│ • Таблицы: organizations, inspections, │
-│ violations, profiles + справочники │
-└─────────────────────────────────────────┘
+# Архитектурная схема системы (Поток управления и данные)
 
+## 1. Презентационный слой (Presentation — P)
+**Thymeleaf Templates + HTML/CSS/JS**
+- `main.html`, `inspection-form.html`
+- Валидация форм, условный рендеринг
+- Пользовательские события (клики, отправка данных)
+
+⬇ *HTTP-запросы / пользовательские события*
+
+## 2. Слой управления (Control — C)
+**@Controller / @RestController**
+- `OrganizationController`
+- `InspectionController`
+- `ViolationController`
+- `ProfileController`
+
+⬇ *Делегирование бизнес-логики*
+
+## 3. Слой посредника / бизнес-логики (Mediator — M)
+**@Service**
+- `OrganizationService`
+- `InspectionService`
+- `ViolationService`
+- `ProfileService`
+
+⬇ *Манипуляция сущностями*
+
+## 4. Слой сущностей (Entity — E)
+**@Entity JPA-классы (доменная модель)**
+- `Organization`
+- `Inspection`
+- `Violation`
+- `Profile`
+
+⬇ *Доступ к данным через JPA*
+
+## 5. Фундаментальный слой (Foundation — F)
+**JpaRepository + утилиты**
+- `OrganizationRepository`
+- `InspectionRepository`
+- `ViolationRepository`
+- `ProfileRepository`
+
+⬇ *JDBC / Hibernate*
+
+## 6. База данных
+**PostgreSQL 15**
+- **Схема:** `sanepidcenter`
+- **Таблицы:** `organizations`, `inspections`, `violations`, `profiles` + справочники
+
+---
+
+## Условные обозначения потока
+| Символ | Значение |
+|--------|-----------|
+| ⬇ | Переход управления / вызов нижележащего слоя |
+| ⬆ | Возврат результата (данные, View, ResponseEntity) |
+
+## Краткое описание взаимодействия
+1. **Пользователь** → взаимодействует с **Thymeleaf-шаблонами**.
+2. **Контроллер** → обрабатывает запрос, вызывает **Сервис**.
+3. **Сервис** → реализует бизнес-логику, работает с **Репозиторием** через **JPA-сущности**.
+4. **Репозиторий** → выполняет запросы к **PostgreSQL**.
+5. **Ответ** → проходит обратный путь: данные → сущность → сервис → контроллер → View.
 ---
 
 
