@@ -274,11 +274,36 @@ Swagger UI: http://localhost:8080/swagger-ui.html
 
 ## Тестирование
 
-Тесты реализованы и запускаются через:
+## Запуск JUnit-тестов
+
+Из корня проекта:
 
 ```bash
-./gradlew test
+gradle test
 ```
+
+Результаты тестов:
+- консольный вывод Gradle;
+- HTML-отчёт: `build/reports/tests/test/index.html`.
+
+---
+
+## JaCoCo: отчёт покрытия и контроль порога 40%
+
+В проекте настроены:
+- генерация XML/HTML отчётов JaCoCo;
+- порог покрытия **минимум 40%** (instruction covered ratio);
+- проверка порога включена в `check`.
+
+Запуск:
+
+```bash
+gradle clean test jacocoTestReport jacocoTestCoverageVerification
+```
+
+Где смотреть отчёт покрытия:
+- HTML: `build/reports/jacoco/test/html/index.html`
+- XML: `build/reports/jacoco/test/jacocoTestReport.xml`
 
 ## Полезные ссылки
 
