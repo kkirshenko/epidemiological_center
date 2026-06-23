@@ -305,11 +305,27 @@ gradle clean test jacocoTestReport jacocoTestCoverageVerification
 - HTML: `build/reports/jacoco/test/html/index.html`
 - XML: `build/reports/jacoco/test/jacocoTestReport.xml`
 
+## Статистика разработки
+
+### Метрики Git
+
+- Всего коммитов: 16
+- Период разработки: 23.04.2026 - 23.06.2026
+- Средняя частота: 1,83 коммита в неделю
+
+### График активности
+
+![Активность коммитов](docs/images/commits.png)
+
+### Тепловая карта (Punch Card)
+
+![Распределение коммитов](docs/images/punch.png)
+
 ## Авторы
 
 Зволибовская Екатерина Валерьевна — разработчик, документация
 
-Группа [ПИЖ-б-о-23-2], Email: [kkirshenko@mail.ru], GitHub: [kkirshenko]
+Группа: [ПИЖ-б-о-23-2], Email: [kkirshenko@mail.ru], GitHub: [kkirshenko]
 
 ## Полезные ссылки
 
