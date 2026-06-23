@@ -305,6 +305,12 @@ gradle clean test jacocoTestReport jacocoTestCoverageVerification
 - HTML: `build/reports/jacoco/test/html/index.html`
 - XML: `build/reports/jacoco/test/jacocoTestReport.xml`
 
+## Авторы
+
+Зволибовская Екатерина Валерьевна — разработчик, документация
+
+Группа [ПИЖ-б-о-23-2], Email: [kkirshenko@mail.ru], GitHub: [kkirshenko]
+
 ## Полезные ссылки
 
 - [Документация проекта](docs/)
